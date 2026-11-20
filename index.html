@@ -329,7 +329,7 @@ function check(){
   resolve(ok);
  }else{
   const ok=L.built.map(k=>L.bank[k]).join(' ')===q.en;
-  $('#ans').classList.add(ok?'':'shake');resolve(ok);
+  if(!ok)$('#ans').classList.add('shake');resolve(ok);
  }
 }
 function next(){
