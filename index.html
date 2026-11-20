@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dilbaz</title>
+<meta name="theme-color" content="#2F6BFF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Düzen fikri: tek sütun mobil uygulama, ortalanmış 430px çerçeve; yol zigzag, ders ekranı tam kaplama */
+:root{
+  --bg:#F3F6FB; --card:#FFFFFF; --ink:#18212F; --mute:#6B778C; --line:#DDE4EF;
+  --brand:#2F6BFF; --brand-d:#1E4FD1; --good:#19A56B; --good-bg:#DDF6EA; --bad:#E5484D; --bad-bg:#FDE4E4;
+  --gold:#F5A524; --lock:#C9D1DE; --lock-d:#B2BCCC;
+  --f:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1521; --card:#182131; --ink:#EEF2F9; --mute:#98A4BA; --line:#2A364B;
+  --brand:#5C8DFF; --brand-d:#3B6AE0; --good:#34C98A; --good-bg:#15382B; --bad:#FF6B70; --bad-bg:#3C1D21;
+  --lock:#2C384D; --lock-d:#222C3E; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0F1521; --card:#182131; --ink:#EEF2F9; --mute:#98A4BA; --line:#2A364B;
+  --brand:#5C8DFF; --brand-d:#3B6AE0; --good:#34C98A; --good-bg:#15382B; --bad:#FF6B70; --bad-bg:#3C1D21;
+  --lock:#2C384D; --lock-d:#222C3E; color-scheme:dark;}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-weight:700;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+#app{max-width:430px;height:100%;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--bg);overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;gap:8px;border-bottom:2px solid var(--line);background:var(--card)}
+.brand{display:flex;align-items:center;gap:6px;font-weight:900;font-size:20px;color:var(--brand)}
+.stats{display:flex;gap:14px;font-weight:900;font-size:16px}
+.stat{display:flex;align-items:center;gap:4px}
+.stat.fire{color:var(--gold)}.stat.xp{color:var(--brand)}.stat.heart{color:var(--bad)}
+main{flex:1;overflow-y:auto;padding-bottom:16px}
+.tabs{display:flex;border-top:2px solid var(--line);background:var(--card)}
+.tab{flex:1;padding:10px 0 12px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;font-weight:800;color:var(--mute)}
+.tab svg{width:26px;height:26px}
+.tab[aria-selected="true"]{color:var(--brand)}
+.unit{margin:16px;padding:14px 16px;border-radius:16px;background:var(--brand);color:#fff;border-bottom:4px solid var(--brand-d)}
+.unit small{display:block;font-size:12px;opacity:.85;letter-spacing:.04em;text-transform:uppercase}
+.unit b{font-size:20px;font-weight:900}
+.path{display:flex;flex-direction:column;align-items:center;gap:18px;padding:8px 0 20px}
+.node{position:relative;width:84px;height:78px;border-radius:50%;display:grid;place-items:center;font-size:34px;
+  background:var(--brand);box-shadow:0 7px 0 var(--brand-d);transition:transform .1s}
+.node:active{transform:translateY(5px);box-shadow:0 2px 0 var(--brand-d)}
+.node.done{background:var(--gold);box-shadow:0 7px 0 #C98511}
+.node.lock{background:var(--lock);box-shadow:0 7px 0 var(--lock-d);filter:grayscale(1);opacity:.85}
+.node .lbl{position:absolute;top:100%;margin-top:14px;font-size:13px;font-weight:800;color:var(--mute);white-space:nowrap}
+.start{position:absolute;bottom:100%;margin-bottom:10px;background:var(--card);color:var(--brand);border:2px solid var(--line);padding:6px 12px;border-radius:12px;font-size:14px;font-weight:900;white-space:nowrap;animation:bob 1.4s ease-in-out infinite}
+.start::after{content:"";position:absolute;left:50%;top:100%;width:12px;height:12px;background:var(--card);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translate(-50%,-6px) rotate(45deg)}
+@keyframes bob{50%{transform:translateY(-5px)}}
+.pad{padding:16px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px}
+h2{font-size:22px;font-weight:900;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:2px solid var(--line)}
+.row:last-child{border:0}
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--line);font-weight:900}
+.row.me{background:var(--good-bg);border-radius:12px;border-bottom:0;padding-inline:10px}
+.row .n{flex:1}.row .x{color:var(--mute)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.tile{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px}
+.tile small{display:block;color:var(--mute);font-size:12px}.tile b{font-size:22px;font-weight:900}
+.btn{display:block;width:100%;padding:14px;border-radius:14px;background:var(--brand);color:#fff;font-weight:900;font-size:16px;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 4px 0 var(--brand-d)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--brand-d)}
+.btn:disabled{background:var(--lock);color:var(--mute);box-shadow:0 4px 0 var(--lock-d);cursor:not-allowed}
+.btn.ghost{background:none;color:var(--brand);box-shadow:none;border:2px solid var(--line)}
+.btn.good{background:var(--good);box-shadow:0 4px 0 #0F7B4E}
+.btn.bad{background:var(--bad);box-shadow:0 4px 0 #B0282D}
+/* ders ekranı */
+#lesson{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:5}
+#lesson.on{display:flex}
+.lh{display:flex;align-items:center;gap:12px;padding:14px 16px}
+.x-btn{font-size:26px;color:var(--mute);line-height:1;padding:4px 8px}
+.bar{flex:1;height:16px;border-radius:8px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);border-radius:8px;transition:width .3s;box-shadow:inset 0 5px 0 rgba(255,255,255,.25)}
+.lb{flex:1;overflow-y:auto;padding:8px 20px;display:flex;flex-direction:column;gap:16px}
+.q{font-size:22px;font-weight:900;line-height:1.25;text-wrap:balance}
+.big{font-size:76px;text-align:center;padding:6px 0}
+.opts{display:grid;gap:10px}
+.opt{padding:14px 16px;border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;background:var(--card);font-size:18px;text-align:left;display:flex;gap:12px;align-items:center}
+.opt kbd{font:inherit;font-size:13px;border:2px solid var(--line);border-radius:8px;padding:1px 7px;color:var(--mute)}
+.opt.sel{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 12%,var(--card));color:var(--brand)}
+.opt.ok{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+.opt.no{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.ans{min-height:64px;border-top:2px solid var(--line);border-bottom:2px solid var(--line);padding:8px 0;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{padding:10px 14px;border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;background:var(--card);font-size:17px}
+.chip.used{background:var(--line);color:transparent;border-color:var(--line);pointer-events:none}
+.mt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mt .opt{justify-content:center;text-align:center;padding:14px 8px}
+.opt.gone{opacity:.25;pointer-events:none}
+.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.lf{padding:16px 20px 22px;border-top:2px solid var(--line);background:var(--bg);transition:background .2s}
+.lf.good{background:var(--good-bg);border-color:transparent}.lf.bad{background:var(--bad-bg);border-color:transparent}
+.fb{font-size:20px;font-weight:900;margin-bottom:10px}
+.lf.good .fb{color:var(--good)}.lf.bad .fb{color:var(--bad)}
+.fb small{display:block;font-size:15px;font-weight:700;margin-top:2px}
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+.center h1{font-size:28px;font-weight:900}
+.center p{color:var(--mute);font-size:16px}
+.res{display:flex;gap:10px;width:100%}.res .tile{flex:1;text-align:center}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:9;white-space:nowrap}
+.say{align-self:center;width:96px;height:96px;border-radius:50%;background:var(--brand);box-shadow:0 6px 0 var(--brand-d);font-size:42px;display:grid;place-items:center}
+.say:active{transform:translateY(4px);box-shadow:0 2px 0 var(--brand-d)}
+.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bdg{text-align:center;padding:10px 4px}.bdg span{font-size:28px;display:block}.bdg small{font-size:11px;line-height:1.2}
+.bdg.off{filter:grayscale(1);opacity:.4}
+.mf{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.mas{display:flex;align-items:center;gap:12px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top" id="top"></header>
+  <main id="view"></main>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <section id="lesson" aria-live="polite"></section>
+</div>
+<script>
+function bird(z=30,m='ok'){return `<svg width="${z}" height="${z}" viewBox="0 0 32 32" aria-hidden="true"><path d="M10 9l2-6 3 5 3-5 2 6z" fill="#F5A524"/><circle cx="16" cy="19" r="11" fill="currentColor"/><circle cx="12.5" cy="17" r="3" fill="#fff"/><circle cx="12.5" cy="17" r="1.4" fill="#18212F"/>${m==='sad'?'<path d="M9 13l6 1.5" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/><path d="M12.5 21v3" stroke="#9CC8FF" stroke-width="1.6" stroke-linecap="round"/>':m==='happy'?'<path d="M9 13.5q3.5-2.5 7 0" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round"/>':''}<path d="${m==='sad'?'M20 20l8 2-8 2z':'M20 18l8 3-8 3z'}" fill="#F5A524"/></svg>`}
+const ACC=[['Mavi','#2F6BFF','#1E4FD1'],['Mor','#7C4DFF','#5A32CC'],['Turuncu','#F2711C','#C45610'],['Pembe','#E0457B','#B02F5C'],['Turkuaz','#0E9AA7','#0A7782']];
+function applyAccent(){const a=ACC[S.accent]||ACC[0],r=document.documentElement.style;r.setProperty('--brand',a[1]);r.setProperty('--brand-d',a[2])}
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+const ICON={
+ learn:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 9l10 6 8-4.8V17h2V9z"/><path d="M6 13.5V17c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.5l-6 3.6z"/></svg>',
+ rank:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4h10v3a5 5 0 0 1-4 4.9V15h3v2H8v-2h3v-3.1A5 5 0 0 1 7 7z"/><path d="M5 5H3v2a3 3 0 0 0 3 3V8a1 1 0 0 1-1-1zm14 0v2a1 1 0 0 1-1 1v2a3 3 0 0 0 3-3V5z"/><path d="M7 19h10v2H7z"/></svg>',
+ me:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c.6-4.4 4-6.5 8.5-6.5s7.900 2.100 8.500 6.500z"/></svg>'};
+const FLAME='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s1 4-2 7c-2 2-4 4-4 8a6 6 0 0 0 12 0c0-3-1.500-5-3-6 0 2-1 3-2 3 1-4 0-8-1-12z"/></svg>';
+const HEART='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8-5.200-8-11a4.800 4.800 0 0 1 8-3.400A4.800 4.800 0 0 1 20 10c0 5.800-8 11-8 11z"/></svg>';
+const BOLT='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>';
+
+/* İçerik: [İngilizce, Türkçe, emoji] */
+const UNITS=[
+ {t:'Bölüm 1 · Temel',n:'Günlük konuşma',ls:[
+  {id:'l1',title:'Selamlaşma',icon:'👋',words:[['hello','merhaba','👋'],['goodbye','hoşça kal','🚪'],['thanks','teşekkürler','🙏'],['please','lütfen','🤲'],['yes','evet','✅'],['no','hayır','❌']],
+   sents:[{tr:'Günaydın',en:'Good morning',x:['night','evening']},{tr:'Nasılsın?',en:'How are you?',x:['is','he']},{tr:'İyiyim',en:'I am fine',x:['you','are']}]},
+  {id:'l2',title:'Yiyecek',icon:'🍎',words:[['apple','elma','🍎'],['water','su','💧'],['bread','ekmek','🍞'],['milk','süt','🥛'],['cheese','peynir','🧀'],['tea','çay','🍵']],
+   sents:[{tr:'Su içiyorum',en:'I drink water',x:['eat','milk']},{tr:'Ekmek yiyor',en:'She eats bread',x:['drink','tea']},{tr:'Elma istiyorum',en:'I want an apple',x:['cheese','the']}]},
+  {id:'l3',title:'Hayvanlar',icon:'🐱',words:[['cat','kedi','🐱'],['dog','köpek','🐶'],['bird','kuş','🐦'],['fish','balık','🐟'],['horse','at','🐴'],['cow','inek','🐄']],
+   sents:[{tr:'Kedi uyuyor',en:'The cat is sleeping',x:['dog','runs']},{tr:'Köpeğim büyük',en:'My dog is big',x:['cat','small']},{tr:'Kuş uçuyor',en:'The bird flies',x:['fish','swims']}]}]},
+ {t:'Bölüm 2 · Keşfet',n:'Renkler, aile, seyahat',ls:[
+  {id:'l4',title:'Renkler',icon:'🎨',words:[['red','kırmızı','🔴'],['blue','mavi','🔵'],['green','yeşil','🟢'],['yellow','sarı','🟡'],['black','siyah','⚫'],['white','beyaz','⚪']],
+   sents:[{tr:'Gökyüzü mavi',en:'The sky is blue',x:['red','sea']},{tr:'Elma kırmızı',en:'The apple is red',x:['green','are']},{tr:'Kar beyaz',en:'Snow is white',x:['black','a']}]},
+  {id:'l5',title:'Aile',icon:'👨‍👩‍👧',words:[['mother','anne','👩'],['father','baba','👨'],['brother','erkek kardeş','👦'],['sister','kız kardeş','👧'],['grandmother','babaanne','👵'],['child','çocuk','🧒']],
+   sents:[{tr:'Annem evde',en:'My mother is at home',x:['father','in']},{tr:'Kardeşim okulda',en:'My brother is at school',x:['sister','on']},{tr:'Çocuk gülüyor',en:'The child is laughing',x:['crying','are']}]},
+  {id:'l6',title:'Seyahat',icon:'✈️',words:[['airport','havalimanı','🛫'],['ticket','bilet','🎫'],['hotel','otel','🏨'],['map','harita','🗺️'],['train','tren','🚆'],['passport','pasaport','🛂']],
+   sents:[{tr:'Biletim nerede?',en:'Where is my ticket?',x:['train','are']},{tr:'Otele gidiyorum',en:'I am going to the hotel',x:['map','from']},{tr:'Tren geç kaldı',en:'The train is late',x:['early','was']}]}]},
+ {t:'Bölüm 3 · Günlük hayat',n:'Sayılar, günler, şehir',ls:[
+  {id:'l7',title:'Sayılar',icon:'🔢',words:[['one','bir','1️⃣'],['two','iki','2️⃣'],['three','üç','3️⃣'],['four','dört','4️⃣'],['five','beş','5️⃣'],['ten','on','🔟']],
+   sents:[{tr:'İki elma',en:'Two apples',x:['three','apple']},{tr:'Üç kedi var',en:'There are three cats',x:['is','two']},{tr:'Beş kitap',en:'Five books',x:['four','book']}]},
+  {id:'l8',title:'Günler',icon:'📅',words:[['Monday','pazartesi','📅'],['Friday','cuma','🎉'],['Sunday','pazar','☀️'],['today','bugün','📍'],['tomorrow','yarın','⏭️'],['week','hafta','🗓️']],
+   sents:[{tr:'Bugün cuma',en:'Today is Friday',x:['Monday','are']},{tr:'Yarın pazar',en:'Tomorrow is Sunday',x:['Today','was']},{tr:'Haftaya görüşürüz',en:'See you next week',x:['today','tomorrow']}]},
+  {id:'l9',title:'Şehir',icon:'🏙️',words:[['school','okul','🏫'],['hospital','hastane','🏥'],['market','market','🛒'],['street','sokak','🛣️'],['bridge','köprü','🌉'],['park','park','🌳']],
+   sents:[{tr:'Okul yakın',en:'The school is near',x:['far','hospital']},{tr:'Parka gidiyorum',en:'I am going to the park',x:['market','from']},{tr:'Market açık',en:'The market is open',x:['closed','a']}]}]}
+];
+const ALL=UNITS.flatMap(u=>u.ls);
+const OFFSETS=[0,46,66,46,0,-46,-66,-46];
+
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[]};
+try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function badges(){const d=id=>S.done.includes(id);return [
+ {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
+ {id:'b2',name:'Kusursuz ders',icon:'💎',ok:(S.perf||0)>=1},
+ {id:'b3',name:'Bölüm 1 bitti',icon:'🥉',ok:d('l1')&&d('l2')&&d('l3')},
+ {id:'b4',name:'7 günlük seri',icon:'🔥',ok:S.streak>=7},
+ {id:'b5',name:'500 XP',icon:'⚡',ok:S.xp>=500},
+ {id:'b6',name:'Tekrarcı',icon:'🔁',ok:(S.prac||0)>=3},
+ {id:'b7',name:'Hedef avcısı',icon:'🎯',ok:(S.hits||0)>=3},
+ {id:'b8',name:'9 ders',icon:'🏆',ok:S.done.length>=9}]}
+function showLevel(){
+ $('#lesson').classList.add('on');
+ $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
+ <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
+}
+function dayCheck(){const td=new Date().toDateString();if(S.day!==td){S.day=td;S.todayXp=0;S.today=false}}
+dayCheck();
+const save=()=>{try{localStorage.setItem('dilbaz-v1',JSON.stringify(S))}catch(e){}};
+const $=s=>document.querySelector(s);
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function unlocked(i){return i===0||S.done.includes(ALL[i-1].id)}
+
+/* ---------- ana ekran ---------- */
+function renderTop(){
+ $('#top').innerHTML=`<div class="brand">${bird(30)}Dilbaz</div><div class="stats">
+ <span class="stat fire">${FLAME}${S.streak}</span><span class="stat xp">${BOLT}${S.xp}</span><span class="stat heart">${HEART}${S.hearts}</span></div>`;
+}
+function renderTabs(){
+ const t=[['learn','Öğren'],['rank','Sıralama'],['me','Profil']];
+ $('#tabs').innerHTML=t.map(([k,l])=>`<button class="tab" role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${ICON[k]}${l}</button>`).join('');
+}
+function renderView(){
+ const v=$('#view');
+ if(S.tab==='learn'){
+  let idx=0,h=`<div class="pad" style="padding-bottom:0"><div class="card mas" style="color:var(--brand)">${bird(52,'happy')}<div style="color:var(--ink);font-size:16px;flex:1">${S.today?'Bugünkü dersi bitirdin, serin devam ediyor!':'Merhaba! Serini korumak için bugün bir ders yap.'}<div class="bar" style="height:10px;margin-top:8px"><i style="width:${Math.min(100,S.todayXp/S.goal*100)}%"></i></div><small style="color:var(--mute);font-size:12px">Günlük hedef ${S.todayXp}/${S.goal} XP</small></div></div>
+  <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button></div>`;
+  UNITS.forEach(u=>{
+   h+=`<div class="unit"><small>${u.t}</small><b>${u.n}</b></div><div class="path">`;
+   u.ls.forEach((l,k)=>{
+    const i=idx++,done=S.done.includes(l.id),open=unlocked(i),cur=open&&!done;
+    const cls=done?'done':open?'':'lock';
+    h+=`<div style="transform:translateX(${OFFSETS[i%8]}px);position:relative">
+     <button class="node ${cls}" data-lesson="${l.id}" aria-label="${l.title}${open?'':' (kilitli)'}">
+     ${cur?'<span class="start">BAŞLA</span>':''}${done?'⭐':open?l.icon:'🔒'}<span class="lbl">${l.title}</span></button></div>`;
+    if(k<u.ls.length-1)h+='<div style="height:10px"></div>';
+   });
+   h+='</div>';
+  });
+  v.innerHTML=h;
+ }else if(S.tab==='rank'){
+  const others=[['Elif',1480],['Mert',1210],['Zeynep',960],['Can',640],['Defne',410],['Burak',230]];
+  const all=others.concat([['Sen',S.xp]]).sort((a,b)=>b[1]-a[1]);
+  v.innerHTML=`<div class="pad"><h2>Haftalık sıralama</h2><div class="card">${all.map((p,i)=>
+   `<div class="row ${p[0]==='Sen'?'me':''}"><b style="width:22px">${i+1}</b><span class="av">${p[0][0]}</span><span class="n">${p[0]}</span><span class="x">${p[1]} XP</span></div>`).join('')}</div></div>`;
+ }else{
+  v.innerHTML=`<div class="pad"><h2>Profil</h2><div class="card" style="display:flex;gap:14px;align-items:center;color:var(--brand)">${bird(56)}<div style="color:var(--ink)"><b style="font-size:20px">Öğrenci</b><div style="color:var(--mute)">İngilizce öğreniyor</div></div></div>
+  <div class="grid2"><div class="tile"><small>Günlük seri</small><b>${S.streak}</b></div><div class="tile"><small>Toplam XP</small><b>${S.xp}</b></div>
+  <div class="tile"><small>Biten ders</small><b>${S.done.length}/${ALL.length}</b></div><div class="tile"><small>Kalp</small><b>${S.hearts}/5</b></div></div>
+  <h2 style="margin-top:18px;font-size:18px">Rozetler</h2><div class="grid3">${badges().map(b=>`<div class="tile bdg ${b.ok?'':'off'}"><span>${b.icon}</span><small>${b.name}</small></div>`).join('')}</div>
+  <h2 style="margin-top:18px;font-size:18px">Günlük hedef</h2><div class="card" style="display:flex;gap:10px">${[10,20,30].map(g=>`<button class="btn ${S.goal===g?'':'ghost'}" style="padding:10px" data-goal="${g}">${g} XP</button>`).join('')}</div>
+  <h2 style="margin-top:18px;font-size:18px">Uygulama rengi</h2><div class="card" style="display:flex;gap:12px;justify-content:space-between">${ACC.map((a,k)=>`<button data-accent="${k}" aria-label="${a[0]}" aria-pressed="${S.accent===k}" style="width:44px;height:44px;border-radius:50%;background:${a[1]};border:4px solid ${S.accent===k?'var(--ink)':'var(--card)'};box-shadow:0 3px 0 ${a[2]}"></button>`).join('')}</div>
+  <button class="btn ghost" style="margin-top:16px" data-act="level">Seviyeyi değiştir</button><button class="btn ghost" style="margin-top:10px" data-act="reset">İlerlemeyi sıfırla</button></div>`;
+ }
+}
+function render(){dayCheck();renderTop();renderTabs();renderView()}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('#app').appendChild(t);setTimeout(()=>t.remove(),1800)}
+
+/* ---------- ders ---------- */
+let L=null;
+function mc(w,dir,l){
+ const others=shuf(l.words.filter(x=>x!==w)).slice(0,3);
+ const i=dir==='tr2en'?0:1;
+ return {t:'mc',w:w[0],emoji:w[2],q:dir==='tr2en'?`“${w[1]}” İngilizcede hangisi?`:`“${w[0]}” ne demek?`,
+  opts:shuf([w,...others]).map(x=>x[i]),ans:w[i]};
+}
+function makeQs(l){
+ const w=shuf(l.words),s=shuf(l.sents),can='speechSynthesis' in window;
+ const ls=x=>({t:'mc',w:x[0],listen:true,q:'Duyduğun kelimeyi seç',ans:x[0],opts:shuf([x,...shuf(l.words.filter(y=>y!==x)).slice(0,3)]).map(y=>y[0])});
+ const qs=[mc(w[0],'tr2en',l),mc(w[1],'en2tr',l),can?ls(w[4]):mc(w[4],'tr2en',l),{t:'build',...s[0]},mc(w[2],'tr2en',l),can?ls(w[5]):mc(w[5],'en2tr',l),{t:'build',...s[1]},
+  {t:'match',pairs:shuf(l.words).slice(0,4)}];
+ return qs;
+}
+function practiceLesson(){
+ const pool=ALL.filter(x=>S.done.includes(x.id)),src=pool.length?pool:[ALL[0]];
+ const all=src.flatMap(x=>x.words),weak=all.filter(w=>S.weak.includes(w[0])),rest=shuf(all.filter(w=>!weak.includes(w)));
+ return {id:'practice',title:'Tekrar',icon:'🔁',words:weak.concat(rest).slice(0,6),sents:src.flatMap(x=>x.sents)};
+}
+function openLesson(id){
+ const pr=id==='practice',i=ALL.findIndex(x=>x.id===id);
+ if(!pr&&!unlocked(i)){toast('Önce önceki dersi bitir');return}
+ if(S.hearts<=0){showOut();return}
+ const l=pr?practiceLesson():ALL[i];
+ L={l,qs:makeQs(l),i:0,total:8,ok:0,first:0,sel:null,state:'ask',built:[],bank:[],mt:null,matched:[],wrongTried:false};
+ $('#lesson').classList.add('on');showQ();
+}
+function closeLesson(){L=null;$('#lesson').classList.remove('on');render()}
+function head(){
+ return `<div class="lh"><button class="x-btn" data-act="quit" aria-label="Dersten çık">✕</button><div class="bar"><i style="width:${L.ok/L.total*100}%"></i></div><span class="stat heart">${HEART}${S.hearts}</span></div>`;
+}
+function showQ(){
+ const q=L.qs[L.i];L.sel=null;L.state='ask';L.built=[];L.matched=[];L.mt=null;L.fail=false;
+ let b='';
+ if(q.t==='mc'){
+  b=`<div class="q">${q.q}</div>${q.listen?`<button class="say" data-say="${q.ans}" aria-label="Dinle">🔊</button>`:`<div class="big">${q.emoji}</div>`}<div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-opt="${k}"><kbd>${k+1}</kbd>${o}</button>`).join('')}</div>`;
+ }else if(q.t==='build'){
+  L.bank=shuf(q.en.split(' ').concat(q.x));
+  b=`<div class="q">Bu cümleyi İngilizceye çevir</div><div class="card" style="font-size:20px">${q.tr}</div><div class="ans" id="ans"></div><div class="bank" id="bank"></div>`;
+ }else{
+  L.left=shuf(q.pairs.map(p=>p[0]));L.right=shuf(q.pairs.map(p=>p[1]));
+  b=`<div class="q">Eşleşen çiftlere dokun</div><div class="mt" id="mt"></div>`;
+ }
+ $('#lesson').innerHTML=head()+`<div class="lb" id="lb">${b}</div><div class="lf" id="lf"></div>`;
+ if(q.t==='build')paintBuild();if(q.t==='match')paintMatch();paintFoot();
+ if(q.listen)setTimeout(()=>speak(q.ans),250);
+}
+function paintBuild(){
+ $('#ans').innerHTML=L.built.map(k=>`<button class="chip" data-un="${k}">${L.bank[k]}</button>`).join('');
+ $('#bank').innerHTML=L.bank.map((w,k)=>`<button class="chip ${L.built.includes(k)?'used':''}" data-w="${k}">${w}</button>`).join('');
+}
+function paintMatch(){
+ const q=L.qs[L.i],m=L.matched;
+ const side=(arr,s)=>arr.map((w,k)=>{const gone=m.includes(w);const sel=L.mt&&L.mt.s===s&&L.mt.w===w;
+  return `<button class="opt ${gone?'gone':''} ${sel?'sel':''}" data-m="${s}" data-w="${w}">${w}</button>`}).join('');
+ // iki sütun: sol İngilizce, sağ Türkçe; ızgara satır satır dizilir
+ let h='';for(let k=0;k<4;k++){h+=side([L.left[k]],'l')+side([L.right[k]],'r')}
+ $('#mt').innerHTML=h;
+}
+function paintFoot(){
+ const q=L.qs[L.i],f=$('#lf');
+ if(L.state==='ask'){
+  f.className='lf';
+  if(q.t==='match'){f.innerHTML='';return}
+  const can=q.t==='mc'?L.sel!==null:L.built.length>0;
+  f.innerHTML=`<button class="btn" data-act="check" ${can?'':'disabled'}>Kontrol et</button>`;
+ }else{
+  const good=L.state==='good';
+  f.className='lf '+(good?'good':'bad');
+  const ans=q.t==='mc'?q.ans:q.t==='build'?q.en:'';
+  const msg=good?['Harika!','Mükemmel!','Tam isabet!','Süpersin!'][L.i%4]:['Olmadı','Üzülme, düzelir','Bir dahaki sefere!'][L.i%3];
+  f.innerHTML=`<div class="mf" style="color:var(--brand)">${bird(46,good?'happy':'sad')}<div class="fb" style="margin:0">${msg}${!good&&ans?`<small>Doğru cevap: ${ans}</small>`:''}</div></div>
+   <button class="btn ${good?'good':'bad'}" data-act="next">Devam</button>`;
+ }
+}
+function resolve(good){
+ const q=L.qs[L.i];
+ if(q.w){if(!good){if(!S.weak.includes(q.w))S.weak.push(q.w)}else if(!q.retry)S.weak=S.weak.filter(x=>x!==q.w);save()}
+ if(good){L.ok++;if(!q.retry)L.first++;L.state='good'}
+ else{S.hearts=Math.max(0,S.hearts-1);L.state='bad';if(!q.retry&&q.t!=='match')L.qs.push({...q,retry:true});save()}
+ const bar=document.querySelector('.bar i'),hs=document.querySelector('.lh .heart');
+ if(bar)bar.style.width=L.ok/L.total*100+'%';if(hs)hs.innerHTML=HEART+S.hearts;
+ paintFoot();
+}
+function check(){
+ const q=L.qs[L.i];
+ if(q.t==='mc'){
+  const o=document.querySelectorAll('.opt'),ok=q.opts[L.sel]===q.ans;
+  o.forEach((e,k)=>{e.disabled=true;if(q.opts[k]===q.ans)e.classList.add('ok');else if(k===L.sel)e.classList.add('no');e.classList.remove('sel')});
+  resolve(ok);
+ }else{
+  const ok=L.built.map(k=>L.bank[k]).join(' ')===q.en;
+  $('#ans').classList.add(ok?'':'shake');resolve(ok);
+ }
+}
+function next(){
+ if(S.hearts<=0){L=null;showOut();return}
+ L.i++;
+ if(L.i>=L.qs.length)return finish();
+ showQ();
+}
+function finish(){
+ const bb=badges().filter(b=>b.ok).map(b=>b.id),earn=10+L.first*3,first=!S.done.includes(L.l.id)&&L.l.id!=='practice',pre=S.todayXp;
+ S.xp+=earn;S.todayXp+=earn;if(first)S.done.push(L.l.id);
+ const hit=pre<S.goal&&S.todayXp>=S.goal;
+ let bump=false;if(!S.today){S.today=true;S.streak++;bump=true}
+ S.n=(S.n||0)+1;if(L.first===L.total)S.perf=(S.perf||0)+1;if(L.l.id==='practice')S.prac=(S.prac||0)+1;if(hit)S.hits=(S.hits||0)+1;
+ const nb=badges().filter(b=>b.ok&&!bb.includes(b.id));
+ save();
+ const acc=Math.round(L.first/L.total*100);
+ $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>Ders tamamlandı!</h1><p>${L.l.title} dersini bitirdin${bump?` · seri ${S.streak} gün`:''}${hit?' · günlük hedef tamam!':''}</p>
+  <div class="res"><div class="tile"><small>Kazanılan XP</small><b style="color:var(--brand)">+${earn}</b></div><div class="tile"><small>İsabet</small><b style="color:var(--good)">%${acc}</b></div></div>${nb.length?`<div class="card" style="width:100%">Yeni rozet: ${nb.map(b=>b.icon+' '+b.name).join(', ')}</div>`:''}</div>
+  <div class="lf"><button class="btn good" data-act="close">Devam</button></div>`;
+}
+function showOut(){
+ $('#lesson').classList.add('on');
+ $('#lesson').innerHTML=`<div class="center"><div style="font-size:80px">💔</div><h1>Kalpların bitti</h1><p>Yenilemek için 20 XP harca ya da daha sonra tekrar dene.</p></div>
+  <div class="lf" style="display:grid;gap:10px"><button class="btn" data-act="refill">Kalpleri yenile (−20 XP)</button><button class="btn ghost" data-act="close">Şimdi değil</button></div>`;
+}
+
+/* ---------- olaylar ---------- */
+document.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ const d=t.dataset;
+ if(d.level!==undefined){const first=!S.level,lv=+d.level;S.level=lv+1;S.done=[...new Set((first?[]:S.done).concat(['l1','l2','l3','l4','l5','l6'].slice(0,[0,3,6][lv])))];save();closeLesson();return}
+ if(d.act==='level'){showLevel();return}
+ if(d.goal){S.goal=+d.goal;save();render();return}
+ if(d.tab){S.tab=d.tab;render();return}
+ if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
+ if(d.lesson){openLesson(d.lesson);return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[]};save();applyAccent();render();return}
+ if(d.act==='close'){closeLesson();return}
+ if(d.act==='quit'){closeLesson();return}
+ if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
+ if(!L)return;
+ if(d.say){speak(d.say);return}
+ if(d.act==='check'){check();return}
+ if(d.act==='next'){next();return}
+ const q=L.qs[L.i];
+ if(d.opt!==undefined&&L.state==='ask'){
+  L.sel=+d.opt;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===t));paintFoot();return}
+ if(d.w!==undefined&&q.t==='build'&&L.state==='ask'){L.built.push(+d.w);paintBuild();paintFoot();return}
+ if(d.un!==undefined&&L.state==='ask'){L.built=L.built.filter(k=>k!==+d.un);paintBuild();paintFoot();return}
+ if(d.m&&q.t==='match'&&L.state==='ask'){
+  if(!L.mt||L.mt.s===d.m){L.mt={s:d.m,w:d.w};paintMatch();return}
+  const en=d.m==='l'?d.w:L.mt.w,tr=d.m==='r'?d.w:L.mt.w;
+  const ok=q.pairs.some(p=>p[0]===en&&p[1]===tr);
+  if(ok){L.matched.push(en,tr);L.mt=null;paintMatch();
+   if(L.matched.length===8){L.state=L.fail?'good':'good';L.ok++;L.first+=L.fail?0:1;const bar=document.querySelector('.bar i');bar.style.width=L.ok/L.total*100+'%';
+    const f=$('#lf');f.className='lf good';f.innerHTML='<div class="mf" style="color:var(--brand)">'+bird(46,'happy')+'<div class="fb" style="margin:0">Harika!</div></div><button class="btn good" data-act="next">Devam</button>'}
+  }else{
+   L.fail=true;L.mt=null;if(!S.weak.includes(en))S.weak.push(en);S.hearts=Math.max(0,S.hearts-1);save();paintMatch();
+   t.classList.add('shake');document.querySelector('.lh .heart').innerHTML=HEART+S.hearts;
+   if(S.hearts<=0){setTimeout(()=>{L=null;showOut()},500)}
+  }
+ }
+});
+document.addEventListener('keydown',e=>{
+ if(!L||e.key!=='Enter')return;
+ const b=document.querySelector('#lf .btn:not(:disabled)');if(b)b.click();
+});
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+applyAccent();render();if(!S.level)showLevel();
+</script>
+</body>
+</html>
