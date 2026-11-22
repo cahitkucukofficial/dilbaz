@@ -171,11 +171,20 @@ const UNITS=[
   {id:'l8',title:'Günler',icon:'📅',words:[['Monday','pazartesi','📅'],['Friday','cuma','🎉'],['Sunday','pazar','☀️'],['today','bugün','📍'],['tomorrow','yarın','⏭️'],['week','hafta','🗓️']],
    sents:[{tr:'Bugün cuma',en:'Today is Friday',x:['Monday','are']},{tr:'Yarın pazar',en:'Tomorrow is Sunday',x:['Today','was']},{tr:'Haftaya görüşürüz',en:'See you next week',x:['today','tomorrow']}]},
   {id:'l9',title:'Şehir',icon:'🏙️',words:[['school','okul','🏫'],['hospital','hastane','🏥'],['market','market','🛒'],['street','sokak','🛣️'],['bridge','köprü','🌉'],['park','park','🌳']],
-   sents:[{tr:'Okul yakın',en:'The school is near',x:['far','hospital']},{tr:'Parka gidiyorum',en:'I am going to the park',x:['market','from']},{tr:'Market açık',en:'The market is open',x:['closed','a']}]}]}
+   sents:[{tr:'Okul yakın',en:'The school is near',x:['far','hospital']},{tr:'Parka gidiyorum',en:'I am going to the park',x:['market','from']},{tr:'Market açık',en:'The market is open',x:['closed','a']}]}]},
+ {t:'Bölüm 4 · Konuş',n:'Fiiller, zamanlar, kalıplar, diyaloglar',ls:[
+  {id:'l10',title:'Fiiller',icon:'🏃',words:[['eat','yemek','🍽️'],['drink','içmek','🥤'],['go','gitmek','🚶'],['come','gelmek','👋'],['read','okumak','📖'],['write','yazmak','✍️']],
+   sents:[{tr:'Yemek istiyorum',en:'I want to eat',x:['drink','am']},{tr:'Okula gidiyorum',en:'I am going to school',x:['come','at']},{tr:'Kitap okuyorum',en:'I am reading a book',x:['write','the']}]},
+  {id:'l11',title:'Zaman ifadeleri',icon:'⏰',words:[['now','şimdi','⏱️'],['later','sonra','⏳'],['always','her zaman','♾️'],['never','asla','🚫'],['yesterday','dün','⏮️'],['morning','sabah','🌅']],
+   sents:[{tr:'Şimdi gidiyorum',en:'I am going now',x:['later','was']},{tr:'Dün evdeydim',en:'I was at home yesterday',x:['tomorrow','am']},{tr:'Sabah çay içerim',en:'I drink tea in the morning',x:['never','at']}]},
+  {id:'l12',title:'Günlük kalıplar',icon:'💬',words:[['excuse me','affedersiniz','🙋'],['sorry','özür dilerim','😔'],['nice to meet you','tanıştığımıza memnun oldum','🤝'],['how much?','kaç para?','💰'],['help!','imdat!','🆘'],['I understand','anlıyorum','💡']],
+   sents:[{tr:'Affedersiniz, otel nerede?',en:'Excuse me, where is the hotel?',x:['sorry','are']},{tr:'Özür dilerim, geç kaldım',en:'Sorry, I am late',x:['excuse','was']},{tr:'Bu ne kadar?',en:'How much is this?',x:['many','are']}]},
+  {id:'l13',title:'Kısa diyaloglar',icon:'🗣️',words:[['What is your name?','Adın ne?','🪪'],['My name is Ali','Benim adım Ali','🙂'],['Where are you from?','Nerelisin?','🌍'],['I am from Turkey','Türkiye\'denim','🇹🇷'],['Do you speak English?','İngilizce konuşuyor musun?','🗣️'],['I am fine, thanks','İyiyim, teşekkürler','😊']],
+   sents:[{tr:'Merhaba, nasılsın?',en:'Hello, how are you?',x:['what','is']},{tr:'Adım Ali, memnun oldum',en:'My name is Ali, nice to meet you',x:['your','are']},{tr:'Biraz İngilizce konuşuyorum',en:'I speak a little English',x:['much','speaks']}]}]}
 ];
 const ALL=UNITS.flatMap(u=>u.ls);
-const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n'};
-const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8'];
+const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n',l10:'v',l11:'t',l12:'p',l13:'p'};
+const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8','l10','l11','l12','l13'];
 const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','tea'];
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
@@ -198,7 +207,7 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.10.1';
+const VER='1.11.0';
 function remShow(t,b){
  try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',badge:'favicon-32.png',tag:'dilbaz'})).catch(()=>{try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}});return}}catch(e){}
  try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}
@@ -493,6 +502,7 @@ function genSents(sec='all'){
   o.push({en:`This is not ${a}${n.en}`,tr:m?`Bu ${t} değil`:`Bu bir ${t} değil`,w:n.en,blank:`This is not ${a}___`});
  });
  if(NN.length)A.forEach(a=>{const n=NN[Math.random()*NN.length|0];o.push({en:`The ${n.en} is ${a.en}`,tr:`${cap(n.tr)} ${a.tr}`,w:a.en,blank:`The ${n.en} is ___`})});
+ T.filter(w=>w.k==='v').forEach(v=>{const t=v.tr,c=t[0].toLocaleUpperCase('tr')+t.slice(1);o.push({en:`I want to ${v.en}`,tr:`${c} istiyorum`,w:v.en,blank:'I want to ___'});o.push({en:`Do you want to ${v.en}?`,tr:`${c} istiyor musun?`,w:v.en,blank:'Do you want to ___?'})});
  D.forEach(d=>o.push({en:`Today is ${d.en}`,tr:`Bugün ${d.tr}`,w:d.en,blank:'Today is ___'}));
  return o;
 }
