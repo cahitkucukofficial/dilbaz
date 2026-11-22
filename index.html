@@ -180,7 +180,7 @@ const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','t
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
-let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',photo:'',crowns:{},freezes:0,lastActive:'',note:''};
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};
 try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 function badges(){const d=id=>S.done.includes(id);return [
  {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
@@ -198,7 +198,26 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.8.0';
+const VER='1.9.1';
+function logAdd(o){
+ const t=day(0),e=S.log[t]||(S.log[t]={xp:0,w:0,l:0,c:0,n:0});
+ for(const k in o)e[k]=(e[k]||0)+o[k];
+ Object.keys(S.log).forEach(k=>{if(k<day(-13))delete S.log[k]});
+}
+function weekStats(){
+ const E={xp:0,w:0,l:0,c:0,n:0},days=[...Array(7)].map((_,i)=>{const d=day(i-6);return {d,...E,...(S.log[d]||{})}});
+ const sum=k=>days.reduce((a,x)=>a+x[k],0),cnt={};
+ S.weak.forEach(en=>{const w=WP.find(x=>x.en===en);if(w)cnt[w.s]=(cnt[w.s]||0)+1});
+ const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+ return {days,xp:sum('xp'),w:sum('w'),l:sum('l'),acc:sum('n')?Math.round(sum('c')/sum('n')*100):null,active:days.filter(x=>x.xp>0).length,best:days.slice().sort((a,b)=>b.xp-a.xp)[0],top};
+}
+function weekCard(){
+ const w=weekStats(),mx=Math.max(1,...w.days.map(x=>x.xp)),wd=(d,f)=>new Date(d+'T12:00:00').toLocaleDateString('tr',{weekday:f});
+ const bars=w.days.map((x,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="height:70px;display:flex;align-items:flex-end;width:100%"><div style="width:100%;height:${Math.max(4,x.xp/mx*70)}px;border-radius:6px;background:${x.xp?(i===6?'var(--brand)':'var(--good)'):'var(--line)'}"></div></div><small style="font-size:11px;color:var(--mute)">${wd(x.d,'short')}</small></div>`).join('');
+ const top=w.top?`${ALL.find(x=>x.id===w.top[0]).title} (${w.top[1]} zayıf kelime)`:'Zayıf kelime yok';
+ return `<div style="display:flex;gap:6px">${bars}</div><div class="grid2"><div class="tile"><small>XP</small><b>${w.xp}</b></div><div class="tile"><small>Yeni kelime</small><b>${w.w}</b></div><div class="tile"><small>Ders</small><b>${w.l}</b></div><div class="tile"><small>Doğruluk</small><b>${w.acc===null?'-':'%'+w.acc}</b></div></div>
+ <div style="margin-top:12px;font-size:14px;color:var(--mute);line-height:1.7">Aktif gün: <b style="color:var(--ink)">${w.active}/7</b><br>En verimli gün: <b style="color:var(--ink)">${w.best.xp?wd(w.best.d,'long')+' ('+w.best.xp+' XP)':'-'}</b><br>Geliştirilecek konu: <b style="color:var(--ink)">${top}</b></div>`;
+}
 const crownsTotal=()=>Object.values(S.crowns||{}).reduce((a,b)=>a+b,0);
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function setPhoto(f){
@@ -271,8 +290,10 @@ function renderView(){
  }else{
   v.innerHTML=`<div class="pad"><h2>Profil</h2><div class="card" style="display:flex;gap:14px;align-items:center;color:var(--brand)"><button data-act="pickphoto" aria-label="Fotoğraf seç" style="width:76px;height:76px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--line);flex:none">${S.photo?`<img src="${S.photo}" alt="Profil fotoğrafı" style="width:100%;height:100%;object-fit:cover">`:bird(56)}</button>
   <div style="flex:1;color:var(--ink)"><input id="pn" class="ti" maxlength="20" value="${esc(S.name)}" placeholder="Adını yaz" aria-label="Adın" style="padding:10px;font-size:18px"><div style="display:flex;gap:14px;margin-top:6px;font-size:13px"><button data-act="pickphoto" style="color:var(--brand)">${S.photo?'Fotoğrafı değiştir':'Fotoğraf ekle'}</button>${S.photo?'<button data-act="rmphoto" style="color:var(--mute)">Kaldır</button>':''}</div></div></div><input type="file" id="pf" accept="image/*" hidden></div>
+  <div class="card"><div style="font-size:13px;color:var(--mute);margin-bottom:4px">Şehir</div><input id="pc" class="ti" maxlength="30" value="${esc(S.city||'')}" placeholder="Örn. İstanbul" aria-label="Şehir" style="padding:10px;font-size:16px"><div style="font-size:13px;color:var(--mute);margin:12px 0 4px">Hakkımda</div><textarea id="pb" class="ti" maxlength="140" rows="3" placeholder="Neden İngilizce öğreniyorsun? (en fazla 140 karakter)" aria-label="Hakkımda" style="padding:10px;font-size:16px;resize:none;width:100%;box-sizing:border-box">${esc(S.bio||'')}</textarea></div>
   <div class="grid2"><div class="tile"><small>Günlük seri</small><b>${S.streak}</b></div><div class="tile"><small>Toplam XP</small><b>${S.xp}</b></div>
   <div class="tile"><small>Biten ders</small><b>${S.done.length}/${ALL.length}</b></div><div class="tile"><small>Kalp</small><b>${S.hearts}/5</b></div><div class="tile"><small>Taç</small><b>${crownsTotal()}/${ALL.length*3}</b></div><div class="tile"><small>Öğrenilen kelime</small><b>${S.learned.length}</b></div></div>
+  <h2 style="margin-top:18px;font-size:18px">Son 7 gün</h2><div class="card">${weekCard()}</div>
   <h2 style="margin-top:18px;font-size:18px">Rozetler</h2><div class="grid3">${badges().map(b=>`<div class="tile bdg ${b.ok?'':'off'}"><span>${b.icon}</span><small>${b.name}</small></div>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük hedef</h2><div class="card" style="display:flex;gap:10px">${[10,20,30].map(g=>`<button class="btn ${S.goal===g?'':'ghost'}" style="padding:10px" data-goal="${g}">${g} XP</button>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük kelime hedefi</h2><div class="card" style="display:flex;gap:10px">${[3,5,10].map(g=>`<button class="btn ${S.wGoal===g?'':'ghost'}" style="padding:10px" data-wgoal="${g}">${g} kelime</button>`).join('')}</div>
@@ -416,7 +437,7 @@ function next(){
 }
 function finish(){
  const bb=badges().filter(b=>b.ok).map(b=>b.id),earn=10+L.first*3,first=!S.done.includes(L.l.id)&&!['practice','sentences'].includes(L.l.id),pre=S.todayXp;
- S.xp+=earn;S.todayXp+=earn;if(first)S.done.push(L.l.id);
+ S.xp+=earn;S.todayXp+=earn;logAdd({xp:earn,l:1,c:L.first,n:L.total});if(first)S.done.push(L.l.id);
  const hit=pre<S.goal&&S.todayXp>=S.goal;
  let bump=false;if(!S.today){S.today=true;S.streak++;bump=true}
  S.lastActive=day(0);
@@ -510,7 +531,7 @@ function paintCard(){
  <div class="lf">${W.flip?'<div style="display:grid;gap:10px"><button class="btn good" data-act="wgot">Öğrendim</button><button class="btn ghost" data-act="wagain">Tekrar göster</button></div>':'<button class="btn" data-act="wflip">Anlamı göster</button>'}</div>`;
 }
 function finishCards(){
- const earn=W.got*2,hit=S.wToday>=S.wGoal;
+ const earn=W.got*2,hit=S.wToday>=S.wGoal;logAdd({xp:earn,w:W.got});
  S.xp+=earn;S.todayXp+=earn;let bump=false;if(!S.today&&W.got){S.today=true;S.streak++;bump=true}
  if(W.got)S.lastActive=day(0);save();
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>${hit?'Günlük kelime hedefi tamam!':'Güzel iş!'}</h1><p>${bump?`Seri ${S.streak} gün. `:''}Şimdi cümle pratiğiyle pekiştir.</p>
@@ -545,7 +566,7 @@ document.addEventListener('click',e=>{
  if(d.tab){S.tab=d.tab;render();return}
  if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
  if(d.lesson){openLesson(d.lesson);return}
- if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',photo:'',crowns:{},freezes:0,lastActive:'',note:''};save();applyAccent();render();return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};save();applyAccent();render();return}
  if(d.act==='close'){closeLesson();return}
  if(d.act==='quit'){closeLesson();return}
  if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
@@ -574,7 +595,7 @@ document.addEventListener('click',e=>{
   }
  }
 });
-document.addEventListener('change',e=>{if(e.target.id==='pf')setPhoto(e.target.files[0]);if(e.target.id==='pn'){S.name=e.target.value.trim();save();render()}});
+document.addEventListener('change',e=>{if(e.target.id==='pf')setPhoto(e.target.files[0]);if(e.target.id==='pn'){S.name=e.target.value.trim();save();render()}if(e.target.id==='pc'){S.city=e.target.value.trim();save()}if(e.target.id==='pb'){S.bio=e.target.value.trim();save()}});
 document.addEventListener('input',e=>{if(e.target.id==='bs'){BQ=e.target.value;paintBook()}});
 document.addEventListener('input',e=>{if(L&&e.target.id==='ti'){L.typed=e.target.value;const b=document.querySelector('#lf .btn');if(b)b.disabled=!L.typed.trim()}});
 document.addEventListener('keydown',e=>{
