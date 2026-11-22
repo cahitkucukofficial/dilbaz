@@ -115,6 +115,14 @@ h2{font-size:22px;font-weight:900;margin-bottom:12px}
 .grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .bdg{text-align:center;padding:10px 4px}.bdg span{font-size:28px;display:block}.bdg small{font-size:11px;line-height:1.2}
 .bdg.off{filter:grayscale(1);opacity:.4}
+.ti{width:100%;padding:14px;border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;font:inherit;font-size:20px;background:var(--card);color:var(--ink)}
+.ti:focus{outline:none;border-color:var(--brand)}
+#mic.rec{animation:pulse 1s infinite;background:var(--bad);box-shadow:0 6px 0 #B0282D}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.lbl{text-align:center}.crs{font-size:12px;letter-spacing:2px}
+.lvl{font-size:12px;font-weight:900;color:var(--brand);background:color-mix(in srgb,var(--brand) 14%,transparent);padding:3px 8px;border-radius:10px;white-space:nowrap}
+.fchip{padding:6px 12px;border:2px solid var(--line);border-radius:20px;font-size:13px;background:var(--card)}
+.fchip.on{background:var(--brand);border-color:var(--brand);color:#fff}
 .mf{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .mas{display:flex;align-items:center;gap:12px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -135,6 +143,7 @@ function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.r
 const ICON={
  learn:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 9l10 6 8-4.8V17h2V9z"/><path d="M6 13.5V17c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.5l-6 3.6z"/></svg>',
  rank:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4h10v3a5 5 0 0 1-4 4.9V15h3v2H8v-2h3v-3.1A5 5 0 0 1 7 7z"/><path d="M5 5H3v2a3 3 0 0 0 3 3V8a1 1 0 0 1-1-1zm14 0v2a1 1 0 0 1-1 1v2a3 3 0 0 0 3-3V5z"/><path d="M7 19h10v2H7z"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h7a2 2 0 0 1 1 .3A2 2 0 0 1 13 4h7v14h-7a1.500 1.500 0 0 0-1 2 1.500 1.500 0 0 0-1-2H4z"/></svg>',
  me:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4.5"/><path d="M3.5 21c.6-4.4 4-6.5 8.5-6.5s7.900 2.100 8.500 6.500z"/></svg>'};
 const FLAME='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s1 4-2 7c-2 2-4 4-4 8a6 6 0 0 0 12 0c0-3-1.500-5-3-6 0 2-1 3-2 3 1-4 0-8-1-12z"/></svg>';
 const HEART='<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8-5.200-8-11a4.800 4.800 0 0 1 8-3.400A4.800 4.800 0 0 1 20 10c0 5.800-8 11-8 11z"/></svg>';
@@ -171,7 +180,7 @@ const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','t
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
-let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{}};
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',photo:'',crowns:{},freezes:0,lastActive:'',note:''};
 try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 function badges(){const d=id=>S.done.includes(id);return [
  {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
@@ -181,13 +190,24 @@ function badges(){const d=id=>S.done.includes(id);return [
  {id:'b5',name:'500 XP',icon:'⚡',ok:S.xp>=500},
  {id:'b6',name:'Tekrarcı',icon:'🔁',ok:(S.prac||0)>=3},
  {id:'b7',name:'Hedef avcısı',icon:'🎯',ok:(S.hits||0)>=3},
- {id:'b8',name:'9 ders',icon:'🏆',ok:S.done.length>=9}]}
+ {id:'b8',name:'9 ders',icon:'🏆',ok:S.done.length>=9},
+ {id:'b9',name:'İlk taç',icon:'👑',ok:crownsTotal()>=1},
+ {id:'b10',name:'Usta',icon:'🏅',ok:Object.values(S.crowns||{}).some(c=>c>=3)}]}
 function showLevel(){
  $('#lesson').classList.add('on');
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.3.0';
+const VER='1.8.0';
+const crownsTotal=()=>Object.values(S.crowns||{}).reduce((a,b)=>a+b,0);
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function setPhoto(f){
+ if(!f)return;const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=192;const x=c.getContext('2d'),m=Math.min(im.width,im.height);x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,192,192);S.photo=c.toDataURL('image/jpeg',.82);save();render()};im.src=r.result};
+ r.readAsDataURL(f);
+}
+const SRok=!!(window.SpeechRecognition||window.webkitSpeechRecognition);
+const fold=t=>t.toLocaleLowerCase('tr').replace(/ç/g,'c').replace(/ğ/g,'g').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ş/g,'s').replace(/ü/g,'u').replace(/\s+/g,' ').trim();
 const day=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('sv')};
 const INT=[0,1,3,7,14,30];
 async function updateApp(){
@@ -195,7 +215,16 @@ async function updateApp(){
  try{const r=await navigator.serviceWorker.getRegistrations();for(const x of r)await x.unregister();const k=await caches.keys();for(const x of k)await caches.delete(x)}catch(e){}
  location.href=location.pathname+'?v='+Date.now();
 }
-function dayCheck(){const td=new Date().toDateString();if(S.day!==td){S.day=td;S.todayXp=0;S.today=false;S.wToday=0}}
+function dayCheck(){
+ const td=new Date().toDateString();
+ if(S.day===td)return;
+ const t=day(0);
+ if(!S.lastActive)S.lastActive=t;
+ const gap=Math.round((new Date(t)-new Date(S.lastActive))/864e5);
+ let msg='';
+ if(gap>1&&S.streak>0){const miss=gap-1;if((S.freezes||0)>=miss){S.freezes-=miss;S.lastActive=day(-1);msg='Seri dondurucu '+miss+' günü kurtardı ❄️'}else{S.streak=0;msg='Bir gün kaçırdın, seri sıfırlandı'}}
+ S.day=td;S.todayXp=0;S.today=false;S.wToday=0;if(msg)S.note=msg;
+}
 dayCheck();
 const save=()=>{try{localStorage.setItem('dilbaz-v1',JSON.stringify(S))}catch(e){}};
 const $=s=>document.querySelector(s);
@@ -209,13 +238,13 @@ function renderTop(){
  <span class="stat fire">${FLAME}${S.streak}</span><span class="stat xp">${BOLT}${S.xp}</span><span class="stat heart">${HEART}${S.hearts}</span></div>`;
 }
 function renderTabs(){
- const t=[['learn','Öğren'],['rank','Sıralama'],['me','Profil']];
+ const t=[['learn','Öğren'],['book','Defter'],['rank','Sıralama'],['me','Profil']];
  $('#tabs').innerHTML=t.map(([k,l])=>`<button class="tab" role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${ICON[k]}${l}</button>`).join('');
 }
 function renderView(){
  const v=$('#view');
  if(S.tab==='learn'){
-  let idx=0,h=`<div class="pad" style="padding-bottom:0"><div class="card mas" style="color:var(--brand)">${bird(52,'happy')}<div style="color:var(--ink);font-size:16px;flex:1">${S.today?'Bugünkü dersi bitirdin, serin devam ediyor!':'Merhaba! Serini korumak için bugün bir ders yap.'}<div class="bar" style="height:10px;margin-top:8px"><i style="width:${Math.min(100,S.todayXp/S.goal*100)}%"></i></div><small style="color:var(--mute);font-size:12px">Günlük hedef ${S.todayXp}/${S.goal} XP</small></div></div>
+  let idx=0,h=`<div class="pad" style="padding-bottom:0"><div class="card mas" style="color:var(--brand)">${bird(52,'happy')}<div style="color:var(--ink);font-size:16px;flex:1">${S.today?'Bugünkü dersi bitirdin, serin devam ediyor!':'Merhaba'+(S.name?' '+esc(S.name):'')+'! Serini korumak için bugün bir ders yap.'}<div class="bar" style="height:10px;margin-top:8px"><i style="width:${Math.min(100,S.todayXp/S.goal*100)}%"></i></div><small style="color:var(--mute);font-size:12px">Günlük hedef ${S.todayXp}/${S.goal} XP</small><div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px">❄️ ${S.freezes||0} seri dondurucu<button class="fchip" data-act="buyfreeze">Al · 50 XP</button></div></div></div>
   <div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Günlük kelime hedefi</b><span style="color:var(--mute)">${S.wToday}/${S.wGoal}</span></div><div class="bar" style="height:10px;margin:8px 0 12px"><i style="width:${Math.min(100,S.wToday/S.wGoal*100)}%"></i></div><div class="grid2" style="margin-top:0"><button class="btn" style="padding:10px;font-size:14px" data-act="cards">Kelime kartları</button><button class="btn ghost" style="padding:10px;font-size:14px" data-act="sents">Cümle pratiği</button></div><small style="color:var(--mute);font-size:12px;display:block;margin-top:8px">${S.learned.length} kelime öğrendin</small></div>
   <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${dueWords().length?dueWords().length+' kelime tekrar zamanı':S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button></div>`;
   UNITS.forEach(u=>{
@@ -223,23 +252,27 @@ function renderView(){
    u.ls.forEach((l,k)=>{
     const i=idx++,done=S.done.includes(l.id),open=unlocked(i),cur=open&&!done;
     const cls=done?'done':open?'':'lock';
-    h+=`<div style="transform:translateX(${OFFSETS[i%8]}px);position:relative">
+    h+=`<div style="transform:translateX(${OFFSETS[i%8]}px);position:relative;margin-bottom:26px">
      <button class="node ${cls}" data-lesson="${l.id}" aria-label="${l.title}${open?'':' (kilitli)'}">
-     ${cur?'<span class="start">BAŞLA</span>':''}${done?'⭐':open?l.icon:'🔒'}<span class="lbl">${l.title}</span></button></div>`;
+     ${cur?'<span class="start">BAŞLA</span>':''}${done?'⭐':open?l.icon:'🔒'}<span class="lbl">${l.title}${open?`<br><span class="crs">${[1,2,3].map(k=>`<span style="${(S.crowns[l.id]||0)>=k?'':'opacity:.25;filter:grayscale(1)'}">👑</span>`).join('')}</span>`:''}</span></button></div>`;
     if(k<u.ls.length-1)h+='<div style="height:10px"></div>';
    });
    h+='</div>';
   });
   v.innerHTML=h;
+ }else if(S.tab==='book'){
+  v.innerHTML=`<div class="pad"><h2>Kelime defteri</h2><input id="bs" class="ti" placeholder="Ara (İngilizce ya da Türkçe)" value="${esc(BQ)}" aria-label="Kelime ara"><div style="display:flex;gap:8px;margin:12px 0">${[['all','Tümü'],['weak','Zayıf'],['due','Tekrar zamanı']].map(([k,l])=>`<button class="fchip ${BF===k?'on':''}" data-bf="${k}">${l}</button>`).join('')}</div><div class="card" id="bl"></div></div>`;
+  paintBook();
  }else if(S.tab==='rank'){
   const others=[['Elif',1480],['Mert',1210],['Zeynep',960],['Can',640],['Defne',410],['Burak',230]];
-  const all=others.concat([['Sen',S.xp]]).sort((a,b)=>b[1]-a[1]);
+  const all=others.concat([[S.name||'Sen',S.xp,1]]).sort((a,b)=>b[1]-a[1]);
   v.innerHTML=`<div class="pad"><h2>Haftalık sıralama</h2><div class="card">${all.map((p,i)=>
-   `<div class="row ${p[0]==='Sen'?'me':''}"><b style="width:22px">${i+1}</b><span class="av">${p[0][0]}</span><span class="n">${p[0]}</span><span class="x">${p[1]} XP</span></div>`).join('')}</div></div>`;
+   `<div class="row ${p[2]?'me':''}"><b style="width:22px">${i+1}</b><span class="av" style="overflow:hidden">${p[2]&&S.photo?`<img src="${S.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:esc(p[0][0])}</span><span class="n">${esc(p[0])}</span><span class="x">${p[1]} XP</span></div>`).join('')}</div></div>`;
  }else{
-  v.innerHTML=`<div class="pad"><h2>Profil</h2><div class="card" style="display:flex;gap:14px;align-items:center;color:var(--brand)">${bird(56)}<div style="color:var(--ink)"><b style="font-size:20px">Öğrenci</b><div style="color:var(--mute)">İngilizce öğreniyor</div></div></div>
+  v.innerHTML=`<div class="pad"><h2>Profil</h2><div class="card" style="display:flex;gap:14px;align-items:center;color:var(--brand)"><button data-act="pickphoto" aria-label="Fotoğraf seç" style="width:76px;height:76px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--line);flex:none">${S.photo?`<img src="${S.photo}" alt="Profil fotoğrafı" style="width:100%;height:100%;object-fit:cover">`:bird(56)}</button>
+  <div style="flex:1;color:var(--ink)"><input id="pn" class="ti" maxlength="20" value="${esc(S.name)}" placeholder="Adını yaz" aria-label="Adın" style="padding:10px;font-size:18px"><div style="display:flex;gap:14px;margin-top:6px;font-size:13px"><button data-act="pickphoto" style="color:var(--brand)">${S.photo?'Fotoğrafı değiştir':'Fotoğraf ekle'}</button>${S.photo?'<button data-act="rmphoto" style="color:var(--mute)">Kaldır</button>':''}</div></div></div><input type="file" id="pf" accept="image/*" hidden></div>
   <div class="grid2"><div class="tile"><small>Günlük seri</small><b>${S.streak}</b></div><div class="tile"><small>Toplam XP</small><b>${S.xp}</b></div>
-  <div class="tile"><small>Biten ders</small><b>${S.done.length}/${ALL.length}</b></div><div class="tile"><small>Kalp</small><b>${S.hearts}/5</b></div></div>
+  <div class="tile"><small>Biten ders</small><b>${S.done.length}/${ALL.length}</b></div><div class="tile"><small>Kalp</small><b>${S.hearts}/5</b></div><div class="tile"><small>Taç</small><b>${crownsTotal()}/${ALL.length*3}</b></div><div class="tile"><small>Öğrenilen kelime</small><b>${S.learned.length}</b></div></div>
   <h2 style="margin-top:18px;font-size:18px">Rozetler</h2><div class="grid3">${badges().map(b=>`<div class="tile bdg ${b.ok?'':'off'}"><span>${b.icon}</span><small>${b.name}</small></div>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük hedef</h2><div class="card" style="display:flex;gap:10px">${[10,20,30].map(g=>`<button class="btn ${S.goal===g?'':'ghost'}" style="padding:10px" data-goal="${g}">${g} XP</button>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük kelime hedefi</h2><div class="card" style="display:flex;gap:10px">${[3,5,10].map(g=>`<button class="btn ${S.wGoal===g?'':'ghost'}" style="padding:10px" data-wgoal="${g}">${g} kelime</button>`).join('')}</div>
@@ -258,12 +291,17 @@ function mc(w,dir,l){
  return {t:'mc',w:w[0],emoji:w[2],q:dir==='tr2en'?`“${w[1]}” İngilizcede hangisi?`:`“${w[0]}” ne demek?`,
   opts:shuf([w,...others]).map(x=>x[i]),ans:w[i]};
 }
-function makeQs(l){
+function pic(w,l){const o=shuf(l.words.filter(x=>x!==w)).slice(0,3);return {t:'mc',pic:true,w:w[0],q:`“${w[0]}” hangisi?`,opts:shuf([w,...o]).map(x=>x[2]),ans:w[2]}}
+function makeQs(l,lv=2){
  const w=shuf(l.words),s=shuf(l.sents),can='speechSynthesis' in window;
  const ls=x=>({t:'mc',w:x[0],listen:true,q:'Duyduğun kelimeyi seç',ans:x[0],opts:shuf([x,...shuf(l.words.filter(y=>y!==x)).slice(0,3)]).map(y=>y[0])});
- const qs=[mc(w[0],'tr2en',l),mc(w[1],'en2tr',l),can?ls(w[4]):mc(w[4],'tr2en',l),{t:'build',...s[0]},mc(w[2],'tr2en',l),can?ls(w[5]):mc(w[5],'en2tr',l),{t:'build',...s[1]},
-  {t:'match',pairs:shuf(l.words).slice(0,4)}];
- return qs;
+ const ty=(x,d)=>d==='en'?{t:'type',w:x[0],emoji:x[2],q:'İngilizcesini yaz',show:x[1],ans:x[0]}:{t:'type',w:x[0],emoji:x[2],q:'Türkçesini yaz',show:x[0],ans:x[1],hint:'Türkçe harfler şart değil'};
+ const sy=x=>({t:'say',w:x[0],emoji:x[2],ans:x[0],tr:x[1]});
+ const M={t:'match',pairs:shuf(l.words).slice(0,4)},B=i=>({t:'build',...s[i%s.length]});
+ const L1=[mc(w[0],'tr2en',l),pic(w[1],l),can?ls(w[2]):mc(w[2],'tr2en',l),mc(w[3],'en2tr',l),pic(w[4],l),mc(w[5],'tr2en',l),B(0),M];
+ const L2=[mc(w[0],'tr2en',l),pic(w[1],l),can?ls(w[4]):mc(w[4],'tr2en',l),B(0),ty(w[2],'en'),SRok?sy(w[3]):mc(w[3],'en2tr',l),ty(w[5],'tr'),B(1),M];
+ const L3=[ty(w[0],'en'),ty(w[1],'tr'),B(0),SRok?sy(w[2]):ty(w[2],'en'),can?ls(w[3]):ty(w[3],'tr'),B(1),ty(w[4],'en'),B(2),M];
+ return lv===1?L1:lv===3?L3:L2;
 }
 function dueWords(){const t=day(0);return WP.filter(w=>S.learned.includes(w.en)&&((S.box[w.en]||{d:t}).d<=t))}
 function practiceLesson(){
@@ -279,18 +317,22 @@ function openLesson(id){
  if(!pr&&!unlocked(i)){toast('Önce önceki dersi bitir');return}
  if(S.hearts<=0){showOut();return}
  const l=pr?practiceLesson():ALL[i];
- L={l,qs:makeQs(l),i:0,total:8,ok:0,first:0,sel:null,state:'ask',built:[],bank:[],mt:null,matched:[],wrongTried:false};
+ const c=pr?0:(S.crowns[id]||0),lv=pr?2:Math.min(3,c+1),qq=makeQs(l,lv);L={l,lv:pr?0:lv,qs:qq,i:0,total:qq.length,ok:0,first:0,sel:null,state:'ask',built:[],bank:[],mt:null,matched:[],wrongTried:false};
  $('#lesson').classList.add('on');showQ();
 }
 function closeLesson(){L=null;W=null;$('#lesson').classList.remove('on');render()}
 function head(){
- return `<div class="lh"><button class="x-btn" data-act="quit" aria-label="Dersten çık">✕</button><div class="bar"><i style="width:${L.ok/L.total*100}%"></i></div><span class="stat heart">${HEART}${S.hearts}</span></div>`;
+ return `<div class="lh"><button class="x-btn" data-act="quit" aria-label="Dersten çık">✕</button><div class="bar"><i style="width:${L.ok/L.total*100}%"></i></div>${L.lv?`<span class="lvl">Seviye ${L.lv}</span>`:''}<span class="stat heart">${HEART}${S.hearts}</span></div>`;
 }
 function showQ(){
- const q=L.qs[L.i];L.sel=null;L.state='ask';L.built=[];L.matched=[];L.mt=null;L.fail=false;
+ const q=L.qs[L.i];L.sel=null;L.typed='';L.state='ask';L.built=[];L.matched=[];L.mt=null;L.fail=false;
  let b='';
  if(q.t==='mc'){
-  b=`<div class="q">${q.q}</div>${q.listen?`<button class="say" data-say="${q.ans}" aria-label="Dinle">🔊</button>`:q.sent?`<div class="card" style="font-size:20px;line-height:1.7">${q.sent}</div>`:`<div class="big">${q.emoji}</div>`}<div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-opt="${k}"><kbd>${k+1}</kbd>${o}</button>`).join('')}</div>`;
+  b=`<div class="q">${q.q}</div>${q.listen?`<button class="say" data-say="${q.ans}" aria-label="Dinle">🔊</button>`:q.sent?`<div class="card" style="font-size:20px;line-height:1.7">${q.sent}</div>`:q.pic?'':`<div class="big">${q.emoji}</div>`}${q.pic?`<div class="opts" style="grid-template-columns:1fr 1fr">${q.opts.map((o,k)=>`<button class="opt" data-opt="${k}" style="justify-content:center;font-size:52px;padding:16px">${o}</button>`).join('')}</div>`:`<div class="opts">${q.opts.map((o,k)=>`<button class="opt" data-opt="${k}"><kbd>${k+1}</kbd>${o}</button>`).join('')}</div>`}`;
+ }else if(q.t==='type'){
+  b=`<div class="q">${q.q}</div><div class="big">${q.emoji}</div><div class="card" style="text-align:center;font-size:26px;font-weight:900">${q.show}</div><input id="ti" class="ti" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Buraya yaz">${q.hint?`<small style="color:var(--mute)">${q.hint}</small>`:''}`;
+ }else if(q.t==='say'){
+  b=`<div class="q">Sesli söyle</div><div class="big">${q.emoji}</div><div class="card" style="text-align:center;font-size:30px;font-weight:900">${q.ans}<div style="font-size:16px;color:var(--mute);font-weight:700">${q.tr}</div></div><div style="display:flex;gap:16px;justify-content:center"><button class="say" data-say="${q.ans}" aria-label="Dinle">🔊</button><button class="say" id="mic" data-mic="1" aria-label="Konuş">🎤</button></div>`;
  }else if(q.t==='build'){
   L.bank=shuf(q.en.split(' ').concat(q.x));
   b=`<div class="q">Bu cümleyi İngilizceye çevir</div><div class="card" style="font-size:20px">${q.tr}</div><div class="ans" id="ans"></div><div class="bank" id="bank"></div>`;
@@ -301,6 +343,7 @@ function showQ(){
  $('#lesson').innerHTML=head()+`<div class="lb" id="lb">${b}</div><div class="lf" id="lf"></div>`;
  if(q.t==='build')paintBuild();if(q.t==='match')paintMatch();paintFoot();
  if(q.listen)setTimeout(()=>speak(q.ans),250);
+ if(q.t==='type')setTimeout(()=>{const i=$('#ti');if(i)i.focus()},150);
 }
 function paintBuild(){
  $('#ans').innerHTML=L.built.map(k=>`<button class="chip" data-un="${k}">${L.bank[k]}</button>`).join('');
@@ -319,12 +362,13 @@ function paintFoot(){
  if(L.state==='ask'){
   f.className='lf';
   if(q.t==='match'){f.innerHTML='';return}
-  const can=q.t==='mc'?L.sel!==null:L.built.length>0;
+  if(q.t==='say'){f.innerHTML='<button class="btn ghost" data-act="skipq">Mikrofon çalışmıyor, atla</button>';return}
+  const can=q.t==='mc'?L.sel!==null:q.t==='type'?!!(L.typed&&L.typed.trim()):L.built.length>0;
   f.innerHTML=`<button class="btn" data-act="check" ${can?'':'disabled'}>Kontrol et</button>`;
  }else{
   const good=L.state==='good';
   f.className='lf '+(good?'good':'bad');
-  const ans=q.t==='mc'?q.ans:q.t==='build'?q.en:'';
+  const ans=(q.t==='mc'||q.t==='type'||q.t==='say')?q.ans:q.t==='build'?q.en:'';
   const msg=good?['Harika!','Mükemmel!','Tam isabet!','Süpersin!'][L.i%4]:['Olmadı','Üzülme, düzelir','Bir dahaki sefere!'][L.i%3];
   f.innerHTML=`<div class="mf" style="color:var(--brand)">${bird(46,good?'happy':'sad')}<div class="fb" style="margin:0">${msg}${!good&&ans?`<small>Doğru cevap: ${ans}</small>`:''}</div></div>
    <button class="btn ${good?'good':'bad'}" data-act="next">Devam</button>`;
@@ -341,8 +385,20 @@ function resolve(good){
  if(bar)bar.style.width=L.ok/L.total*100+'%';if(hs)hs.innerHTML=HEART+S.hearts;
  paintFoot();
 }
+function listenMic(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast('Bu cihazda mikrofon desteklenmiyor');return}
+ const q=L.qs[L.i];if(L.state!=='ask')return;
+ const r=new SR(),b=$('#mic');r.lang='en-US';r.interimResults=false;r.maxAlternatives=3;
+ if(b)b.classList.add('rec');
+ r.onresult=e=>{if(!L||L.state!=='ask'||L.qs[L.i]!==q)return;const want=q.ans.toLowerCase();resolve([...e.results[0]].some(a=>a.transcript.toLowerCase().includes(want)))};
+ r.onerror=()=>{if(b)b.classList.remove('rec');toast('Duyamadım, tekrar dene')};
+ r.onend=()=>{if(b)b.classList.remove('rec')};
+ try{r.start()}catch(e){toast('Mikrofon açılamadı')}
+}
 function check(){
  const q=L.qs[L.i];
+ if(q.t==='type'){const i=$('#ti');if(i)i.disabled=true;resolve(fold(L.typed)===fold(q.ans));return}
  if(q.t==='mc'){
   const o=document.querySelectorAll('.opt'),ok=q.opts[L.sel]===q.ans;
   o.forEach((e,k)=>{e.disabled=true;if(q.opts[k]===q.ans)e.classList.add('ok');else if(k===L.sel)e.classList.add('no');e.classList.remove('sel')});
@@ -363,11 +419,14 @@ function finish(){
  S.xp+=earn;S.todayXp+=earn;if(first)S.done.push(L.l.id);
  const hit=pre<S.goal&&S.todayXp>=S.goal;
  let bump=false;if(!S.today){S.today=true;S.streak++;bump=true}
+ S.lastActive=day(0);
+ let crown=0;
+ if(L.lv){const c0=S.crowns[L.l.id]||0,pass=L.first/L.total>=0.7;if(pass&&L.lv===c0+1&&c0<3){S.crowns[L.l.id]=c0+1;crown=1}else if(!pass&&c0<3)crown=-1}
  S.n=(S.n||0)+1;if(L.first===L.total)S.perf=(S.perf||0)+1;if(L.l.id==='practice')S.prac=(S.prac||0)+1;if(hit)S.hits=(S.hits||0)+1;
  const nb=badges().filter(b=>b.ok&&!bb.includes(b.id));
  save();
  const acc=Math.round(L.first/L.total*100);
- $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>Ders tamamlandı!</h1><p>${L.l.title} dersini bitirdin${bump?` · seri ${S.streak} gün`:''}${hit?' · günlük hedef tamam!':''}</p>
+ $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>Ders tamamlandı!</h1><p>${L.l.title} dersini bitirdin${bump?` · seri ${S.streak} gün`:''}${hit?' · günlük hedef tamam!':''}</p>${crown===1?`<div class="card" style="font-size:18px">👑 Yeni taç! (${S.crowns[L.l.id]}/3)</div>`:crown===-1?'<p>Taç için en az %70 doğru gerekir, tekrar dene.</p>':''}
   <div class="res"><div class="tile"><small>Kazanılan XP</small><b style="color:var(--brand)">+${earn}</b></div><div class="tile"><small>İsabet</small><b style="color:var(--good)">%${acc}</b></div></div>${nb.length?`<div class="card" style="width:100%">Yeni rozet: ${nb.map(b=>b.icon+' '+b.name).join(', ')}</div>`:''}</div>
   <div class="lf"><button class="btn good" data-act="close">Devam</button></div>`;
 }
@@ -400,7 +459,23 @@ function cloze(s){
  const w=WP.find(x=>x.en===s.w),d=shuf(WP.filter(x=>x.k===w.k&&x.en!==w.en)).slice(0,3);
  return {t:'mc',w:w.en,sent:`${s.tr}<br><b style="color:var(--brand)">${s.blank}</b>`,q:'Boşluğu doldur',opts:shuf([w.en,...d.map(x=>x.en)]),ans:w.en};
 }
-let PM='cards';
+let PM='cards',BQ='',BF='all';
+const bookWords=()=>WP.filter(w=>S.learned.includes(w.en)||S.done.includes(w.s));
+function paintBook(){
+ const el=$('#bl');if(!el)return;
+ const due=new Set(dueWords().map(w=>w.en)),q=fold(BQ);
+ let list=bookWords();const ix=w=>S.learned.indexOf(w.en);list.sort((a,b)=>ix(b)-ix(a));
+ const total=list.length;
+ if(BF==='weak')list=list.filter(w=>S.weak.includes(w.en));
+ if(BF==='due')list=list.filter(w=>due.has(w.en));
+ if(q)list=list.filter(w=>fold(w.en).includes(q)||fold(w.tr).includes(q));
+ if(!total){el.innerHTML='<p style="color:var(--mute);text-align:center;padding:14px">Henüz kelime yok. Kelime kartlarıyla öğrenmeye başla.</p><button class="btn" data-act="cards">Kelime kartları</button>';return}
+ if(!list.length){el.innerHTML='<p style="color:var(--mute);text-align:center;padding:14px">Bu filtreyle kelime bulunamadı.</p>';return}
+ el.innerHTML=`<div style="color:var(--mute);font-size:13px;margin-bottom:4px">${list.length} kelime</div>`+list.map(w=>{
+  const b=(S.box[w.en]||{b:1}).b,weak=S.weak.includes(w.en);
+  const chip=weak?['Zayıf','var(--bad)']:b>=5?['Usta','var(--gold)']:b>=3?['Pekişiyor','var(--good)']:['Yeni','var(--brand)'];
+  return `<div class="row"><span style="font-size:28px">${w.e}</span><div class="n"><b>${esc(w.en)}</b><br><span style="color:var(--mute)">${esc(w.tr)}</span></div><span style="font-size:12px;color:${chip[1]}">${chip[0]}</span><button class="x-btn" data-say="${esc(w.en)}" aria-label="Dinle">🔊</button></div>`}).join('');
+}
 function openPicker(m){
  PM=m;
  const row=(id,ic,t,sub)=>`<button class="opt" data-sec="${id}"><span style="font-size:26px">${ic}</span><span style="flex:1">${t}<br><small style="color:var(--mute);font-size:12px">${sub}</small></span></button>`;
@@ -436,7 +511,8 @@ function paintCard(){
 }
 function finishCards(){
  const earn=W.got*2,hit=S.wToday>=S.wGoal;
- S.xp+=earn;S.todayXp+=earn;let bump=false;if(!S.today&&W.got){S.today=true;S.streak++;bump=true}save();
+ S.xp+=earn;S.todayXp+=earn;let bump=false;if(!S.today&&W.got){S.today=true;S.streak++;bump=true}
+ if(W.got)S.lastActive=day(0);save();
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>${hit?'Günlük kelime hedefi tamam!':'Güzel iş!'}</h1><p>${bump?`Seri ${S.streak} gün. `:''}Şimdi cümle pratiğiyle pekiştir.</p>
  <div class="res"><div class="tile"><small>Bugün</small><b style="color:var(--brand)">${S.wToday}/${S.wGoal}</b></div><div class="tile"><small>Toplam kelime</small><b style="color:var(--good)">${S.learned.length}</b></div><div class="tile"><small>XP</small><b>+${earn}</b></div></div></div>
  <div class="lf"><button class="btn good" data-act="close">Devam</button></div>`;
@@ -447,6 +523,8 @@ document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;
  const d=t.dataset;
  if(d.say){speak(d.say);return}
+ if(d.act==='pickphoto'){const f=document.getElementById('pf');if(f)f.click();return}
+ if(d.act==='rmphoto'){S.photo='';save();render();return}
  if(d.act==='cards'){openPicker('cards');return}
  if(d.act==='sents'){openPicker('sents');return}
  if(d.sec){PM==='cards'?openCards(d.sec):openSents(d.sec);return}
@@ -457,15 +535,17 @@ document.addEventListener('click',e=>{
   if(d.act==='wagain'){W.q.push(W.q.shift());W.flip=false;paintCard();return}
   if(d.act==='wquit'){closeLesson();return}
  }
+ if(d.bf){BF=d.bf;render();return}
  if(d.wgoal){S.wGoal=+d.wgoal;save();render();return}
  if(d.level!==undefined){const first=!S.level,lv=+d.level;S.level=lv+1;S.done=[...new Set((first?[]:S.done).concat(['l1','l2','l3','l4','l5','l6'].slice(0,[0,3,6][lv])))];save();closeLesson();return}
  if(d.act==='level'){showLevel();return}
  if(d.act==='update'){updateApp();return}
+ if(d.act==='buyfreeze'){if((S.freezes||0)>=2)toast('En fazla 2 dondurucu taşıyabilirsin');else if(S.xp<50)toast('50 XP gerekli');else{S.xp-=50;S.freezes=(S.freezes||0)+1;save();toast('Seri dondurucu alındı ❄️');render()}return}
  if(d.goal){S.goal=+d.goal;save();render();return}
  if(d.tab){S.tab=d.tab;render();return}
  if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
  if(d.lesson){openLesson(d.lesson);return}
- if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{}};save();applyAccent();render();return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',photo:'',crowns:{},freezes:0,lastActive:'',note:''};save();applyAccent();render();return}
  if(d.act==='close'){closeLesson();return}
  if(d.act==='quit'){closeLesson();return}
  if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
@@ -473,6 +553,8 @@ document.addEventListener('click',e=>{
  if(d.say){speak(d.say);return}
  if(d.act==='check'){check();return}
  if(d.act==='next'){next();return}
+ if(d.mic!==undefined){listenMic();return}
+ if(d.act==='skipq'){L.ok++;next();return}
  const q=L.qs[L.i];
  if(d.opt!==undefined&&L.state==='ask'){
   L.sel=+d.opt;document.querySelectorAll('.opt').forEach(x=>x.classList.toggle('sel',x===t));paintFoot();return}
@@ -492,12 +574,16 @@ document.addEventListener('click',e=>{
   }
  }
 });
+document.addEventListener('change',e=>{if(e.target.id==='pf')setPhoto(e.target.files[0]);if(e.target.id==='pn'){S.name=e.target.value.trim();save();render()}});
+document.addEventListener('input',e=>{if(e.target.id==='bs'){BQ=e.target.value;paintBook()}});
+document.addEventListener('input',e=>{if(L&&e.target.id==='ti'){L.typed=e.target.value;const b=document.querySelector('#lf .btn');if(b)b.disabled=!L.typed.trim()}});
 document.addEventListener('keydown',e=>{
  if(!L||e.key!=='Enter')return;
  const b=document.querySelector('#lf .btn:not(:disabled)');if(b)b.click();
 });
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
 applyAccent();render();if(!S.level)showLevel();
+if(S.note){toast(S.note);S.note='';save()}
 </script>
 </body>
 </html>
