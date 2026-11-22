@@ -180,7 +180,7 @@ const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','t
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
-let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};
 try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 function badges(){const d=id=>S.done.includes(id);return [
  {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
@@ -198,7 +198,25 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.9.1';
+const VER='1.10.1';
+function remShow(t,b){
+ try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',badge:'favicon-32.png',tag:'dilbaz'})).catch(()=>{try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}});return}}catch(e){}
+ try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}
+}
+function remCheck(){
+ const r=S.rem;if(!r||!r.on||!('Notification' in window)||Notification.permission!=='granted')return;
+ const n=new Date(),hm=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+ if(S.today||r.last===day(0)||hm<r.t)return;
+ r.last=day(0);save();
+ remShow('Dilbaz 🐦',S.streak>0?`Serin ${S.streak} gün! Bugünkü dersini yapmayı unutma.`:'Bugün küçük bir ders yapalım mı?');
+}
+function remCard(){
+ const ok='Notification' in window,r=S.rem||{on:false,t:'19:00'},den=ok&&Notification.permission==='denied';
+ if(!ok)return `<div class="card" style="color:var(--mute);font-size:14px;line-height:1.5">Bu tarayıcı bildirimleri desteklemiyor. iPhone'da uygulamayı ana ekrana ekleyip oradan açarsan (iOS 16.4+) çalışabilir.</div>`;
+ return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Günlük hatırlatma</b><button class="btn ${r.on?'':'ghost'}" style="padding:8px 16px" data-act="remtoggle">${r.on?'Açık':'Kapalı'}</button></div>
+ <div style="display:flex;align-items:center;gap:10px;margin-top:12px"><span style="color:var(--mute)">Saat</span><input id="rt" type="time" class="ti" value="${r.t}" style="padding:8px;font-size:16px;width:auto"><button class="btn ghost" style="padding:8px 14px;margin-left:auto" data-act="remtest">Dene</button></div>
+ <div style="margin-top:10px;font-size:12.5px;color:var(--mute);line-height:1.5">${den?'Bildirim izni engellenmiş; tarayıcı ayarlarından izin ver.':'Bugünkü dersi yapmadıysan, seçtiğin saatten sonra uygulama açıkken/arka plandayken hatırlatır. Uygulama tamamen kapalıysa telefon hatırlatamayabilir.'}</div></div>`;
+}
 function logAdd(o){
  const t=day(0),e=S.log[t]||(S.log[t]={xp:0,w:0,l:0,c:0,n:0});
  for(const k in o)e[k]=(e[k]||0)+o[k];
@@ -291,11 +309,13 @@ function renderView(){
   v.innerHTML=`<div class="pad"><h2>Profil</h2><div class="card" style="display:flex;gap:14px;align-items:center;color:var(--brand)"><button data-act="pickphoto" aria-label="Fotoğraf seç" style="width:76px;height:76px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--line);flex:none">${S.photo?`<img src="${S.photo}" alt="Profil fotoğrafı" style="width:100%;height:100%;object-fit:cover">`:bird(56)}</button>
   <div style="flex:1;color:var(--ink)"><input id="pn" class="ti" maxlength="20" value="${esc(S.name)}" placeholder="Adını yaz" aria-label="Adın" style="padding:10px;font-size:18px"><div style="display:flex;gap:14px;margin-top:6px;font-size:13px"><button data-act="pickphoto" style="color:var(--brand)">${S.photo?'Fotoğrafı değiştir':'Fotoğraf ekle'}</button>${S.photo?'<button data-act="rmphoto" style="color:var(--mute)">Kaldır</button>':''}</div></div></div><input type="file" id="pf" accept="image/*" hidden></div>
   <div class="card"><div style="font-size:13px;color:var(--mute);margin-bottom:4px">Şehir</div><input id="pc" class="ti" maxlength="30" value="${esc(S.city||'')}" placeholder="Örn. İstanbul" aria-label="Şehir" style="padding:10px;font-size:16px"><div style="font-size:13px;color:var(--mute);margin:12px 0 4px">Hakkımda</div><textarea id="pb" class="ti" maxlength="140" rows="3" placeholder="Neden İngilizce öğreniyorsun? (en fazla 140 karakter)" aria-label="Hakkımda" style="padding:10px;font-size:16px;resize:none;width:100%;box-sizing:border-box">${esc(S.bio||'')}</textarea></div>
+  <button class="btn" id="psave" data-act="saveprof" style="margin-top:10px">Kaydet</button>
   <div class="grid2"><div class="tile"><small>Günlük seri</small><b>${S.streak}</b></div><div class="tile"><small>Toplam XP</small><b>${S.xp}</b></div>
   <div class="tile"><small>Biten ders</small><b>${S.done.length}/${ALL.length}</b></div><div class="tile"><small>Kalp</small><b>${S.hearts}/5</b></div><div class="tile"><small>Taç</small><b>${crownsTotal()}/${ALL.length*3}</b></div><div class="tile"><small>Öğrenilen kelime</small><b>${S.learned.length}</b></div></div>
   <h2 style="margin-top:18px;font-size:18px">Son 7 gün</h2><div class="card">${weekCard()}</div>
   <h2 style="margin-top:18px;font-size:18px">Rozetler</h2><div class="grid3">${badges().map(b=>`<div class="tile bdg ${b.ok?'':'off'}"><span>${b.icon}</span><small>${b.name}</small></div>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük hedef</h2><div class="card" style="display:flex;gap:10px">${[10,20,30].map(g=>`<button class="btn ${S.goal===g?'':'ghost'}" style="padding:10px" data-goal="${g}">${g} XP</button>`).join('')}</div>
+  <h2 style="margin-top:18px;font-size:18px">Hatırlatma</h2>${remCard()}
   <h2 style="margin-top:18px;font-size:18px">Günlük kelime hedefi</h2><div class="card" style="display:flex;gap:10px">${[3,5,10].map(g=>`<button class="btn ${S.wGoal===g?'':'ghost'}" style="padding:10px" data-wgoal="${g}">${g} kelime</button>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Uygulama rengi</h2><div class="card" style="display:flex;gap:12px;justify-content:space-between">${ACC.map((a,k)=>`<button data-accent="${k}" aria-label="${a[0]}" aria-pressed="${S.accent===k}" style="width:44px;height:44px;border-radius:50%;background:${a[1]};border:4px solid ${S.accent===k?'var(--ink)':'var(--card)'};box-shadow:0 3px 0 ${a[2]}"></button>`).join('')}</div>
   <button class="btn ghost" style="margin-top:16px" data-act="free">${S.free?'Dersleri tekrar kilitle':'Tüm dersleri aç'}</button><button class="btn ghost" style="margin-top:10px" data-act="update">Güncellemeyi kontrol et</button><div style="text-align:center;color:var(--mute);font-size:12px;margin-top:6px">Sürüm ${VER}</div><button class="btn ghost" style="margin-top:10px" data-act="level">Seviyeyi değiştir</button><button class="btn ghost" style="margin-top:10px" data-act="reset">İlerlemeyi sıfırla</button></div>`;
@@ -544,6 +564,15 @@ document.addEventListener('click',e=>{
  const t=e.target.closest('button');if(!t)return;
  const d=t.dataset;
  if(d.say){speak(d.say);return}
+ if(d.act==='remtoggle'){(async()=>{
+  S.rem=S.rem||{on:false,t:'19:00',last:''};
+  if(S.rem.on){S.rem.on=false}
+  else{let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();S.rem.on=p==='granted';if(!S.rem.on)alert('Bildirim izni verilmedi.');else{S.rem.last='';remShow('Dilbaz 🐦','Hatırlatma açıldı: her gün '+S.rem.t+' sonrası.')}}
+  save();render()})();return}
+ if(d.act==='remtest'){(async()=>{let p=Notification.permission;if(p==='default')p=await Notification.requestPermission();if(p==='granted')remShow('Dilbaz 🐦','Deneme bildirimi: çalışıyor!');else alert('Bildirim izni verilmedi.');render()})();return}
+ if(d.act==='saveprof'){const g=i=>{const e=document.getElementById(i);return e?e.value.trim():null};
+  const n=g('pn'),c=g('pc'),b=g('pb');if(n!==null)S.name=n;if(c!==null)S.city=c;if(b!==null)S.bio=b;save();
+  const bt=document.getElementById('psave');if(bt){bt.textContent='Kaydedildi ✓';setTimeout(()=>{const x=document.getElementById('psave');if(x)x.textContent='Kaydet'},1600)}return}
  if(d.act==='pickphoto'){const f=document.getElementById('pf');if(f)f.click();return}
  if(d.act==='rmphoto'){S.photo='';save();render();return}
  if(d.act==='cards'){openPicker('cards');return}
@@ -566,7 +595,7 @@ document.addEventListener('click',e=>{
  if(d.tab){S.tab=d.tab;render();return}
  if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
  if(d.lesson){openLesson(d.lesson);return}
- if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};save();applyAccent();render();return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};save();applyAccent();render();return}
  if(d.act==='close'){closeLesson();return}
  if(d.act==='quit'){closeLesson();return}
  if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
@@ -595,7 +624,7 @@ document.addEventListener('click',e=>{
   }
  }
 });
-document.addEventListener('change',e=>{if(e.target.id==='pf')setPhoto(e.target.files[0]);if(e.target.id==='pn'){S.name=e.target.value.trim();save();render()}if(e.target.id==='pc'){S.city=e.target.value.trim();save()}if(e.target.id==='pb'){S.bio=e.target.value.trim();save()}});
+document.addEventListener('change',e=>{if(e.target.id==='pf')setPhoto(e.target.files[0]);if(e.target.id==='pn'){S.name=e.target.value.trim();save();render()}if(e.target.id==='rt'){S.rem=S.rem||{on:false,last:''};S.rem.t=e.target.value||'19:00';S.rem.last='';save()}if(e.target.id==='pc'){S.city=e.target.value.trim();save()}if(e.target.id==='pb'){S.bio=e.target.value.trim();save()}});
 document.addEventListener('input',e=>{if(e.target.id==='bs'){BQ=e.target.value;paintBook()}});
 document.addEventListener('input',e=>{if(L&&e.target.id==='ti'){L.typed=e.target.value;const b=document.querySelector('#lf .btn');if(b)b.disabled=!L.typed.trim()}});
 document.addEventListener('keydown',e=>{
@@ -604,6 +633,7 @@ document.addEventListener('keydown',e=>{
 });
 if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
 applyAccent();render();if(!S.level)showLevel();
+setInterval(remCheck,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)remCheck()});setTimeout(remCheck,1500);
 if(S.note){toast(S.note);S.note='';save()}
 </script>
 </body>
