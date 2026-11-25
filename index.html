@@ -180,11 +180,24 @@ const UNITS=[
   {id:'l12',title:'Günlük kalıplar',icon:'💬',words:[['excuse me','affedersiniz','🙋'],['sorry','özür dilerim','😔'],['nice to meet you','tanıştığımıza memnun oldum','🤝'],['how much?','kaç para?','💰'],['help!','imdat!','🆘'],['I understand','anlıyorum','💡']],
    sents:[{tr:'Affedersiniz, otel nerede?',en:'Excuse me, where is the hotel?',x:['sorry','are']},{tr:'Özür dilerim, geç kaldım',en:'Sorry, I am late',x:['excuse','was']},{tr:'Bu ne kadar?',en:'How much is this?',x:['many','are']}]},
   {id:'l13',title:'Kısa diyaloglar',icon:'🗣️',words:[['What is your name?','Adın ne?','🪪'],['My name is Ali','Benim adım Ali','🙂'],['Where are you from?','Nerelisin?','🌍'],['I am from Turkey','Türkiye\'denim','🇹🇷'],['Do you speak English?','İngilizce konuşuyor musun?','🗣️'],['I am fine, thanks','İyiyim, teşekkürler','😊']],
-   sents:[{tr:'Merhaba, nasılsın?',en:'Hello, how are you?',x:['what','is']},{tr:'Adım Ali, memnun oldum',en:'My name is Ali, nice to meet you',x:['your','are']},{tr:'Biraz İngilizce konuşuyorum',en:'I speak a little English',x:['much','speaks']}]}]}
+   sents:[{tr:'Merhaba, nasılsın?',en:'Hello, how are you?',x:['what','is']},{tr:'Adım Ali, memnun oldum',en:'My name is Ali, nice to meet you',x:['your','are']},{tr:'Biraz İngilizce konuşuyorum',en:'I speak a little English',x:['much','speaks']}]}]},
+ {t:'Bölüm 5 · İlkokul 4. sınıf',n:'Sınıf, meslekler, kıyafetler, boş zaman, günüm, ülkeler',ls:[
+  {id:'l14',title:'Sınıfım',icon:'🎒',words:[['pencil','kalem','✏️'],['eraser','silgi','🧽'],['ruler','cetvel','📏'],['bag','çanta','🎒'],['desk','sıra','🪑'],['notebook','defter','📒']],
+   sents:[{tr:'Kalemim sırada',en:'My pencil is on the desk',x:['bag','in']},{tr:'Çantan nerede?',en:'Where is your bag?',x:['my','are']},{tr:'Bir silgi lütfen',en:'An eraser, please',x:['ruler','the']}]},
+  {id:'l15',title:'Meslekler',icon:'👩‍🏫',words:[['teacher','öğretmen','👩‍🏫'],['doctor','doktor','👨‍⚕️'],['nurse','hemşire','👩‍⚕️'],['farmer','çiftçi','👨‍🌾'],['pilot','pilot','👨‍✈️'],['singer','şarkıcı','🎤']],
+   sents:[{tr:'Babam doktor',en:'My father is a doctor',x:['nurse','are']},{tr:'Annem hemşire',en:'My mother is a nurse',x:['teacher','in']},{tr:'Çiftçi tarlada çalışıyor',en:'The farmer works in the field',x:['pilot','at']}]},
+  {id:'l16',title:'Kıyafetlerim',icon:'👕',words:[['shirt','gömlek','👔'],['skirt','etek','👗'],['dress','elbise','👗'],['jacket','ceket','🧥'],['coat','palto','🧥'],['hat','şapka','🎩']],
+   sents:[{tr:'Şapkam mavi',en:'My hat is blue',x:['red','are']},{tr:'Gömleğim beyaz',en:'My shirt is white',x:['black','are']},{tr:'Elbise güzel',en:'The dress is beautiful',x:['ugly','are']}]},
+  {id:'l17',title:'Boş zaman',icon:'⚽',words:[['play football','futbol oynamak','⚽'],['swim','yüzmek','🏊'],['ride a bike','bisiklete binmek','🚲'],['watch TV','televizyon izlemek','📺'],['listen to music','müzik dinlemek','🎧'],['dance','dans etmek','💃']],
+   sents:[{tr:'Futbol oynamayı seviyorum',en:'I like playing football',x:['swimming','am']},{tr:'Bisiklete biniyorum',en:'I ride a bike',x:['swim','the']},{tr:'Müzik dinliyorsun',en:'You listen to music',x:['dance','is']}]},
+  {id:'l18',title:'Günüm',icon:'🌞',words:[['get up','kalkmak','⏰'],['have breakfast','kahvaltı yapmak','🥐'],['go to school','okula gitmek','🏫'],['do homework','ödev yapmak','📝'],['have dinner','akşam yemeği yemek','🍲'],['go to bed','yatmak','🛏️']],
+   sents:[{tr:'Yedide kalkıyorum',en:'I get up at seven',x:['eight','in']},{tr:'Kahvaltı yapıyorum',en:'I have breakfast',x:['dinner','am']},{tr:'Ödevimi yapıyorum',en:'I do my homework',x:['go','the']}]},
+  {id:'l19',title:'Ülkeler',icon:'🌍',words:[['Turkey','Türkiye','🇹🇷'],['Turkish','Türk','🌙'],['England','İngiltere','🇬🇧'],['English','İngiliz','🫖'],['Germany','Almanya','🇩🇪'],['Japan','Japonya','🇯🇵']],
+   sents:[{tr:'Ben Türküm',en:'I am Turkish',x:['English','is']},{tr:'Almanya\'dan geliyorum',en:'I come from Germany',x:['Japan','to']},{tr:'Japonya çok uzak',en:'Japan is very far',x:['near','are']}]}]}
 ];
 const ALL=UNITS.flatMap(u=>u.ls);
-const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n',l10:'v',l11:'t',l12:'p',l13:'p'};
-const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8','l10','l11','l12','l13'];
+const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n',l10:'v',l11:'t',l12:'p',l13:'p',l14:'n',l15:'n',l16:'n',l17:'v',l18:'v',l19:'o'};
+const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8','l10','l11','l12','l13','l14','l15','l16','l17','l18','l19'];
 const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','tea'];
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
@@ -207,7 +220,7 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.11.0';
+const VER='1.12.0';
 function remShow(t,b){
  try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',badge:'favicon-32.png',tag:'dilbaz'})).catch(()=>{try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}});return}}catch(e){}
  try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}
@@ -489,6 +502,7 @@ function showOut(){
 /* ---------- kelime kartları ve cümle pratiği ---------- */
 const cap=t=>t.charAt(0).toLocaleUpperCase('tr')+t.slice(1);
 const art=w=>MASS.includes(w.en)?'':(/^[aeiou]/i.test(w.en)?'an ':'a ');
+function mi(t){const v=(t.toLowerCase().match(/[aeıioöuü](?=[^aeıioöuü]*$)/)||['a'])[0];return 'aı'.includes(v)?'mı':'ei'.includes(v)?'mi':'ou'.includes(v)?'mu':'mü'}
 function genSents(sec='all'){
  const lw=WP.filter(w=>S.learned.includes(w.en)),NN=lw.filter(w=>w.k==='n'),T=lw.filter(w=>sec==='all'||w.s===sec);
  const N=T.filter(w=>w.k==='n'),A=T.filter(w=>w.k==='a'),D=T.filter(w=>w.k==='d'),o=[];
@@ -498,7 +512,7 @@ function genSents(sec='all'){
   o.push({en:`The ${n.en} is here`,tr:`${cap(t)} burada`,w:n.en,blank:'The ___ is here'});
   o.push({en:`This is ${a}${n.en}`,tr:m?`Bu ${t}`:`Bu bir ${t}`,w:n.en,blank:`This is ${a}___`});
   o.push({en:`There is ${a}${n.en} here`,tr:m?`Burada ${t} var`:`Burada bir ${t} var`,w:n.en,blank:`There is ${a}___ here`});
-  o.push({en:`Is this ${a}${n.en}?`,tr:m?`Bu ${t} mi?`:`Bu bir ${t} mi?`,w:n.en,blank:`Is this ${a}___?`});
+  o.push({en:`Is this ${a}${n.en}?`,tr:m?`Bu ${t} ${mi(t)}?`:`Bu bir ${t} ${mi(t)}?`,w:n.en,blank:`Is this ${a}___?`});
   o.push({en:`This is not ${a}${n.en}`,tr:m?`Bu ${t} değil`:`Bu bir ${t} değil`,w:n.en,blank:`This is not ${a}___`});
  });
  if(NN.length)A.forEach(a=>{const n=NN[Math.random()*NN.length|0];o.push({en:`The ${n.en} is ${a.en}`,tr:`${cap(n.tr)} ${a.tr}`,w:a.en,blank:`The ${n.en} is ___`})});
