@@ -311,7 +311,7 @@ const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunda
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
-let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},stories:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};
 try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 function badges(){const d=id=>S.done.includes(id);return [
  {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
@@ -329,7 +329,48 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.15.0';
+const VER='1.16.0';
+const STORIES=[
+ {id:'s1',t:'Tanışma',e:'👋',L:[['Ali','Hello! My name is Ali.','Merhaba! Benim adım Ali.'],['Mia','Hi, Ali! I am Mia.','Selam Ali! Ben Mia.'],['Ali','Nice to meet you.','Tanıştığımıza memnun oldum.'],['Mia','Nice to meet you, too. How are you?','Ben de memnun oldum. Nasılsın?'],['Ali','I am fine, thank you. And you?','İyiyim, teşekkürler. Ya sen?'],['Mia','I am fine, too.','Ben de iyiyim.']],
+  Q:[['Mia kimdir?','Ali\'nin yeni arkadaşı',['Ali\'nin yeni arkadaşı','Ali\'nin öğretmeni','Ali\'nin kardeşi']],['Ali nasıl?','İyi',['İyi','Yorgun','Üzgün']]]},
+ {id:'s2',t:'Okulda',e:'🏫',L:[['Teacher','Good morning, class!','Günaydın sınıf!'],['Sam','Good morning, teacher.','Günaydın öğretmenim.'],['Teacher','Open your books, please.','Kitaplarınızı açın lütfen.'],['Sam','I have a pencil and a notebook.','Benim bir kalemim ve bir defterim var.'],['Teacher','Great! Let us start.','Harika! Başlayalım.']],
+  Q:[['Sam\'in neleri var?','Kalem ve defter',['Kalem ve defter','Silgi ve çanta','Kitap ve cetvel']],['Öğretmen ne istiyor?','Kitapları açmalarını',['Kitapları açmalarını','Dışarı çıkmalarını','Oturmalarını']]]},
+ {id:'s3',t:'Ailem',e:'👨‍👩‍👧',L:[['Lina','This is my family.','Bu benim ailem.'],['Lina','This is my mother. She is a doctor.','Bu annem. O bir doktor.'],['Lina','This is my father. He is a teacher.','Bu babam. O bir öğretmen.'],['Lina','I have a brother. His name is Tom.','Bir erkek kardeşim var. Adı Tom.'],['Lina','I love my family.','Ailemi seviyorum.']],
+  Q:[['Lina\'nın annesi ne iş yapıyor?','Doktor',['Doktor','Öğretmen','Aşçı']],['Tom kimdir?','Lina\'nın erkek kardeşi',['Lina\'nın erkek kardeşi','Lina\'nın babası','Lina\'nın arkadaşı']]]},
+ {id:'s4',t:'Pazarda',e:'🛒',L:[['Seller','Good morning! Can I help you?','Günaydın! Yardımcı olabilir miyim?'],['Eda','Yes, please. I want three apples.','Evet lütfen. Üç elma istiyorum.'],['Seller','Here you are. Anything else?','Buyurun. Başka bir şey?'],['Eda','Yes, a bottle of water, please.','Evet, bir şişe su lütfen.'],['Seller','That is five liras.','Bu beş lira.'],['Eda','Thank you. Goodbye!','Teşekkürler. Hoşça kal!']],
+  Q:[['Eda kaç elma istiyor?','Üç',['Üç','İki','Beş']],['Eda başka ne alıyor?','Su',['Su','Süt','Ekmek']]]},
+ {id:'s5',t:'Hava durumu',e:'🌦️',L:[['Ben','What is the weather like today?','Bugün hava nasıl?'],['Zoe','It is rainy and cold.','Yağmurlu ve soğuk.'],['Ben','Oh no! I want to play outside.','Olamaz! Dışarıda oynamak istiyorum.'],['Zoe','Let us play games at home.','Evde oyun oynayalım.'],['Ben','Good idea!','İyi fikir!']],
+  Q:[['Bugün hava nasıl?','Yağmurlu ve soğuk',['Yağmurlu ve soğuk','Güneşli ve sıcak','Karlı']],['Çocuklar nerede oynayacak?','Evde',['Evde','Parkta','Okulda']]]},
+ {id:'s6',t:'Günlük rutin',e:'⏰',L:[['Kim','I get up at seven o\'clock.','Saat yedide kalkarım.'],['Kim','I have breakfast at half past seven.','Yedi buçukta kahvaltı yaparım.'],['Kim','I go to school at eight.','Sekizde okula giderim.'],['Kim','I do my homework in the evening.','Akşamları ödevimi yaparım.'],['Kim','I go to bed at nine.','Dokuzda yatarım.']],
+  Q:[['Kim kaçta kalkıyor?','Yedide',['Yedide','Sekizde','Dokuzda']],['Kim ödevini ne zaman yapıyor?','Akşam',['Akşam','Sabah','Öğlen']]]},
+ {id:'s7',t:'Hayvanat bahçesi',e:'🦁',L:[['Dad','Look! This is a lion.','Bak! Bu bir aslan.'],['Mina','It is big and strong!','Büyük ve güçlü!'],['Dad','And that is a monkey.','Şu da bir maymun.'],['Mina','The monkey is eating a banana.','Maymun muz yiyor.'],['Mina','I like the zoo.','Hayvanat bahçesini seviyorum.']],
+  Q:[['Maymun ne yiyor?','Muz',['Muz','Elma','Havuç']],['Mina nereyi seviyor?','Hayvanat bahçesini',['Hayvanat bahçesini','Parkı','Okulu']]]},
+ {id:'s8',t:'Restoranda',e:'🍽️',L:[['Waiter','What would you like?','Ne arzu edersiniz?'],['Can','I would like a pizza, please.','Bir pizza istiyorum lütfen.'],['Waiter','Would you like a drink?','İçecek ister misiniz?'],['Can','Yes, orange juice, please.','Evet, portakal suyu lütfen.'],['Waiter','Sure. It will be ready soon.','Tabii. Yakında hazır olur.']],
+  Q:[['Can ne yemek istiyor?','Pizza',['Pizza','Çorba','Makarna']],['Can ne içecek?','Portakal suyu',['Portakal suyu','Süt','Çay']]]}];
+let SV=null;
+function storyCard(){
+ const n=Object.keys(S.stories||{}).length;
+ return `<button class="opt" data-act="stories" style="margin-top:10px"><span style="font-size:26px">📖</span><span style="flex:1">Hikâyeler<br><small style="color:var(--mute);font-size:12px">${n}/${STORIES.length} okundu · kısa diyaloglar</small></span></button>`;
+}
+function storyList(){
+ $('#lesson').innerHTML=`<div class="lh"><button class="x-btn" data-act="sclose" aria-label="Kapat">✕</button><b style="flex:1">Hikâyeler</b></div><div class="lb">${STORIES.map(x=>`<button class="opt" data-act="sopen" data-story="${x.id}"><span style="font-size:26px">${x.e}</span><span style="flex:1">${x.t}</span>${(S.stories||{})[x.id]?'<span>✅</span>':''}</button>`).join('')}</div>`;
+ $('#lesson').classList.add('on');
+}
+function storyRead(id){
+ const x=STORIES.find(y=>y.id===id);if(!x)return;SV={id,open:{}};
+ $('#lesson').innerHTML=`<div class="lh"><button class="x-btn" data-act="stories" aria-label="Geri">✕</button><b style="flex:1">${x.e} ${x.t}</b></div><div class="lb">
+ <small style="color:var(--mute)">Satıra dokun: Türkçesi · 🔊: dinle</small>
+ ${x.L.map((l,k)=>`<div style="display:flex;gap:8px;align-items:center;margin-top:10px"><button class="opt" data-act="stog" data-k="${k}" style="flex:1;text-align:left;display:block"><small style="color:var(--mute)">${l[0]}</small><div style="font-size:17px;font-weight:800">${l[1]}</div><div id="tr${k}" style="display:none;color:var(--mute);margin-top:4px">${l[2]}</div></button><button class="say" data-say="${l[1].replace(/"/g,'')}" aria-label="Dinle">🔊</button></div>`).join('')}
+ <button class="btn" data-act="sq" data-story="${id}" style="margin-top:16px">Soruları çöz</button></div>`;
+ $('#lesson').classList.add('on');
+}
+function storyQuiz(id){
+ const x=STORIES.find(y=>y.id===id);if(!x)return;
+ if(S.hearts<=0){showOut();return}
+ const qs=x.Q.map(q=>({t:'mc',q:q[0],sent:'',opts:shuf(q[2]),ans:q[1],emoji:x.e}));
+ L={l:{id:'story',title:x.t},sid:id,lv:0,qs,i:0,total:qs.length,ok:0,first:0,sel:null,state:'ask',built:[],bank:[],mt:null,matched:[],wrongTried:false};
+ $('#lesson').classList.add('on');showQ();
+}
 const QP=[
  {id:'xp',t:'50 XP kazan',n:50,g:3,v:e=>e.xp||0},
  {id:'les',t:'2 ders bitir',n:2,g:3,v:e=>e.l||0},
@@ -440,7 +481,7 @@ function renderView(){
  if(S.tab==='learn'){
   let idx=0,h=`<div class="pad" style="padding-bottom:0"><div class="card mas" style="color:var(--brand)">${bird(52,'happy')}<div style="color:var(--ink);font-size:16px;flex:1">${S.today?'Bugünkü dersi bitirdin, serin devam ediyor!':'Merhaba'+(S.name?' '+esc(S.name):'')+'! Serini korumak için bugün bir ders yap.'}<div class="bar" style="height:10px;margin-top:8px"><i style="width:${Math.min(100,S.todayXp/S.goal*100)}%"></i></div><small style="color:var(--mute);font-size:12px">Günlük hedef ${S.todayXp}/${S.goal} XP</small><div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px">❄️ ${S.freezes||0} seri dondurucu<button class="fchip" data-act="buyfreeze">Al · 50 XP</button></div></div></div>
   <div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Günlük kelime hedefi</b><span style="color:var(--mute)">${S.wToday}/${S.wGoal}</span></div><div class="bar" style="height:10px;margin:8px 0 12px"><i style="width:${Math.min(100,S.wToday/S.wGoal*100)}%"></i></div><div class="grid2" style="margin-top:0"><button class="btn" style="padding:10px;font-size:14px" data-act="cards">Kelime kartları</button><button class="btn ghost" style="padding:10px;font-size:14px" data-act="sents">Cümle pratiği</button></div><small style="color:var(--mute);font-size:12px;display:block;margin-top:8px">${S.learned.length} kelime öğrendin</small></div>
-  <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${dueWords().length?dueWords().length+' kelime tekrar zamanı':S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button>${questCard()}</div>`;
+  <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${dueWords().length?dueWords().length+' kelime tekrar zamanı':S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button>${questCard()}${storyCard()}</div>`;
   UNITS.forEach(u=>{
    h+=`<div class="unit"><small>${u.t}</small><b>${u.n}</b></div><div class="path">`;
    u.ls.forEach((l,k)=>{
@@ -615,7 +656,7 @@ function next(){
 }
 function finish(){
  const bb=badges().filter(b=>b.ok).map(b=>b.id),earn=10+L.first*3,first=!S.done.includes(L.l.id)&&!['practice','sentences','story'].includes(L.l.id),pre=S.todayXp;
- S.xp+=earn;S.todayXp+=earn;logAdd({xp:earn,l:1,c:L.first,n:L.total});if(L.first===L.total)logAdd({p:1});if(L.l.id==='practice')logAdd({r:1});if(L.l.id==='sentences')logAdd({q:1});if(L.l.id==='story')logAdd({s:1});monState().l++;if(first)S.done.push(L.l.id);
+ S.xp+=earn;S.todayXp+=earn;logAdd({xp:earn,l:1,c:L.first,n:L.total});if(L.first===L.total)logAdd({p:1});if(L.l.id==='practice')logAdd({r:1});if(L.l.id==='sentences')logAdd({q:1});if(L.l.id==='story')logAdd({s:1});monState().l++;if(L.l.id==='story'&&L.sid){S.stories=S.stories||{};S.stories[L.sid]=1}if(first)S.done.push(L.l.id);
  const hit=pre<S.goal&&S.todayXp>=S.goal;
  let bump=false;if(!S.today){S.today=true;S.streak++;bump=true}
  S.lastActive=day(0);
@@ -760,9 +801,14 @@ document.addEventListener('click',e=>{
  if(d.tab){S.tab=d.tab;render();return}
  if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
  if(d.lesson){openLesson(d.lesson);return}
- if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};save();applyAccent();render();return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},stories:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};save();applyAccent();render();return}
  if(d.act==='close'){closeLesson();return}
  if(d.act==='quit'){closeLesson();return}
+ if(d.act==='stories'){storyList();return}
+ if(d.act==='sclose'){$('#lesson').classList.remove('on');render();return}
+ if(d.act==='sopen'){storyRead(d.story);return}
+ if(d.act==='stog'){const e=document.getElementById('tr'+d.k);if(e)e.style.display=e.style.display==='none'?'block':'none';return}
+ if(d.act==='sq'){storyQuiz(d.story);return}
  if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
  if(!L)return;
  if(d.say){speak(d.say);return}
