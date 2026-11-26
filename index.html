@@ -311,7 +311,7 @@ const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunda
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
-let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};
+let S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'learn',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};
 try{const r=localStorage.getItem('dilbaz-v1');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
 function badges(){const d=id=>S.done.includes(id);return [
  {id:'b1',name:'İlk adım',icon:'🌱',ok:(S.n||0)>=1},
@@ -329,7 +329,33 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.14.0';
+const VER='1.15.0';
+const QP=[
+ {id:'xp',t:'50 XP kazan',n:50,g:3,v:e=>e.xp||0},
+ {id:'les',t:'2 ders bitir',n:2,g:3,v:e=>e.l||0},
+ {id:'wrd',t:'5 yeni kelime öğren',n:5,g:3,v:e=>e.w||0},
+ {id:'per',t:'Bir dersi kusursuz bitir',n:1,g:4,v:e=>e.p||0},
+ {id:'prc',t:'Kelime tekrarı yap',n:1,g:2,v:e=>e.r||0},
+ {id:'snt',t:'Cümle pratiği yap',n:1,g:2,v:e=>e.q||0},
+ {id:'sto',t:'Bir hikâye oku',n:1,g:3,v:e=>e.s||0}];
+function qState(){const t=day(0);if(!S.qd||S.qd.d!==t)S.qd={d:t,cl:[]};return S.qd}
+function qToday(){
+ const t=day(0),seed=[...t].reduce((a,c)=>a+c.charCodeAt(0),0),e=S.log[t]||{},st=qState();
+ return [0,1,2].map(k=>{const q=QP[(seed+k*3)%QP.length],v=q.v(e);return {...q,val:v,ok:v>=q.n,cl:st.cl.includes(q.id)}});
+}
+function monState(){const m=day(0).slice(0,7);if(!S.mon||S.mon.m!==m)S.mon={m,l:0,c:0};return S.mon}
+function questCard(){
+ const qs=qToday(),st=qState(),mo=monState(),all=qs.every(q=>q.cl);
+ const row=q=>`<div style="display:flex;align-items:center;gap:10px;margin-top:10px"><div style="flex:1"><div style="font-size:14px;font-weight:800">${q.t}</div><div class="bar" style="height:8px;margin-top:6px"><i style="width:${Math.min(100,q.val/q.n*100)}%"></i></div></div><span style="font-size:12px;color:var(--mute)">${Math.min(q.val,q.n)}/${q.n}</span>${q.cl?'<span>✅</span>':q.ok?`<button class="fchip" data-act="qclaim" data-q="${q.id}">+${q.g} 💎</button>`:`<span style="font-size:12px;color:var(--mute);min-width:36px;text-align:right">${q.g} 💎</span>`}</div>`;
+ const mOk=mo.l>=20;
+ return `<div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Günlük görevler</b><span style="color:var(--mute)">${S.gems||0} 💎</span></div>${qs.map(row).join('')}
+ <div style="font-size:12px;color:var(--mute);margin-top:10px">${all?'Tüm görevler tamam, bonus alındı 🎉':'Üçünü de tamamla: +5 💎 bonus'}</div>
+ <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><div style="flex:1"><div style="font-size:14px;font-weight:800">Aylık görev: 20 ders bitir</div><div class="bar" style="height:8px;margin-top:6px"><i style="width:${Math.min(100,mo.l/20*100)}%"></i></div></div><span style="font-size:12px;color:var(--mute)">${Math.min(mo.l,20)}/20</span>${mo.c?'<span>✅</span>':mOk?'<button class="fchip" data-act="qmonth">+15 💎</button>':'<span style="font-size:12px;color:var(--mute);min-width:36px;text-align:right">15 💎</span>'}</div></div>`;
+}
+function shopCard(){
+ return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Mağaza</b><span style="color:var(--mute)">${S.gems||0} 💎</span></div>
+ <div class="grid2" style="margin-top:10px"><button class="btn ghost" style="padding:10px;font-size:14px" data-act="gheart">❤️ Kalpler · 10 💎</button><button class="btn ghost" style="padding:10px;font-size:14px" data-act="gfreeze">❄️ Dondurucu · 20 💎</button></div></div>`;
+}
 function remShow(t,b){
  try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',badge:'favicon-32.png',tag:'dilbaz'})).catch(()=>{try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}});return}}catch(e){}
  try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}
@@ -403,7 +429,7 @@ function unlocked(i){return S.free||i===0||S.done.includes(ALL[i-1].id)}
 /* ---------- ana ekran ---------- */
 function renderTop(){
  $('#top').innerHTML=`<div class="brand">${bird(30)}Dilbaz</div><div class="stats">
- <span class="stat fire">${FLAME}${S.streak}</span><span class="stat xp">${BOLT}${S.xp}</span><span class="stat heart">${HEART}${S.hearts}</span></div>`;
+ <span class="stat fire">${FLAME}${S.streak}</span><span class="stat xp">${BOLT}${S.xp}</span><span class="stat heart">${HEART}${S.hearts}</span><span class="stat">💎${S.gems||0}</span></div>`;
 }
 function renderTabs(){
  const t=[['learn','Öğren'],['book','Defter'],['rank','Sıralama'],['me','Profil']];
@@ -414,7 +440,7 @@ function renderView(){
  if(S.tab==='learn'){
   let idx=0,h=`<div class="pad" style="padding-bottom:0"><div class="card mas" style="color:var(--brand)">${bird(52,'happy')}<div style="color:var(--ink);font-size:16px;flex:1">${S.today?'Bugünkü dersi bitirdin, serin devam ediyor!':'Merhaba'+(S.name?' '+esc(S.name):'')+'! Serini korumak için bugün bir ders yap.'}<div class="bar" style="height:10px;margin-top:8px"><i style="width:${Math.min(100,S.todayXp/S.goal*100)}%"></i></div><small style="color:var(--mute);font-size:12px">Günlük hedef ${S.todayXp}/${S.goal} XP</small><div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px">❄️ ${S.freezes||0} seri dondurucu<button class="fchip" data-act="buyfreeze">Al · 50 XP</button></div></div></div>
   <div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Günlük kelime hedefi</b><span style="color:var(--mute)">${S.wToday}/${S.wGoal}</span></div><div class="bar" style="height:10px;margin:8px 0 12px"><i style="width:${Math.min(100,S.wToday/S.wGoal*100)}%"></i></div><div class="grid2" style="margin-top:0"><button class="btn" style="padding:10px;font-size:14px" data-act="cards">Kelime kartları</button><button class="btn ghost" style="padding:10px;font-size:14px" data-act="sents">Cümle pratiği</button></div><small style="color:var(--mute);font-size:12px;display:block;margin-top:8px">${S.learned.length} kelime öğrendin</small></div>
-  <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${dueWords().length?dueWords().length+' kelime tekrar zamanı':S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button></div>`;
+  <button class="card" data-lesson="practice" style="width:100%;margin-top:10px;display:flex;align-items:center;gap:12px;text-align:left"><span style="font-size:30px">🔁</span><span><b>Kelime tekrarı</b><br><small style="color:var(--mute);font-size:13px">${dueWords().length?dueWords().length+' kelime tekrar zamanı':S.weak.length?S.weak.length+' zayıf kelime':'Öğrendiklerini pekiştir'}</small></span></button>${questCard()}</div>`;
   UNITS.forEach(u=>{
    h+=`<div class="unit"><small>${u.t}</small><b>${u.n}</b></div><div class="path">`;
    u.ls.forEach((l,k)=>{
@@ -446,6 +472,7 @@ function renderView(){
   <h2 style="margin-top:18px;font-size:18px">Son 7 gün</h2><div class="card">${weekCard()}</div>
   <h2 style="margin-top:18px;font-size:18px">Rozetler</h2><div class="grid3">${badges().map(b=>`<div class="tile bdg ${b.ok?'':'off'}"><span>${b.icon}</span><small>${b.name}</small></div>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Günlük hedef</h2><div class="card" style="display:flex;gap:10px">${[10,20,30].map(g=>`<button class="btn ${S.goal===g?'':'ghost'}" style="padding:10px" data-goal="${g}">${g} XP</button>`).join('')}</div>
+  <h2 style="margin-top:18px;font-size:18px">Mağaza</h2>${shopCard()}
   <h2 style="margin-top:18px;font-size:18px">Hatırlatma</h2>${remCard()}
   <h2 style="margin-top:18px;font-size:18px">Günlük kelime hedefi</h2><div class="card" style="display:flex;gap:10px">${[3,5,10].map(g=>`<button class="btn ${S.wGoal===g?'':'ghost'}" style="padding:10px" data-wgoal="${g}">${g} kelime</button>`).join('')}</div>
   <h2 style="margin-top:18px;font-size:18px">Uygulama rengi</h2><div class="card" style="display:flex;gap:12px;justify-content:space-between">${ACC.map((a,k)=>`<button data-accent="${k}" aria-label="${a[0]}" aria-pressed="${S.accent===k}" style="width:44px;height:44px;border-radius:50%;background:${a[1]};border:4px solid ${S.accent===k?'var(--ink)':'var(--card)'};box-shadow:0 3px 0 ${a[2]}"></button>`).join('')}</div>
@@ -587,13 +614,13 @@ function next(){
  showQ();
 }
 function finish(){
- const bb=badges().filter(b=>b.ok).map(b=>b.id),earn=10+L.first*3,first=!S.done.includes(L.l.id)&&!['practice','sentences'].includes(L.l.id),pre=S.todayXp;
- S.xp+=earn;S.todayXp+=earn;logAdd({xp:earn,l:1,c:L.first,n:L.total});if(first)S.done.push(L.l.id);
+ const bb=badges().filter(b=>b.ok).map(b=>b.id),earn=10+L.first*3,first=!S.done.includes(L.l.id)&&!['practice','sentences','story'].includes(L.l.id),pre=S.todayXp;
+ S.xp+=earn;S.todayXp+=earn;logAdd({xp:earn,l:1,c:L.first,n:L.total});if(L.first===L.total)logAdd({p:1});if(L.l.id==='practice')logAdd({r:1});if(L.l.id==='sentences')logAdd({q:1});if(L.l.id==='story')logAdd({s:1});monState().l++;if(first)S.done.push(L.l.id);
  const hit=pre<S.goal&&S.todayXp>=S.goal;
  let bump=false;if(!S.today){S.today=true;S.streak++;bump=true}
  S.lastActive=day(0);
  let crown=0;
- if(L.lv){const c0=S.crowns[L.l.id]||0,pass=L.first/L.total>=0.7;if(pass&&L.lv===c0+1&&c0<3){S.crowns[L.l.id]=c0+1;crown=1}else if(!pass&&c0<3)crown=-1}
+ if(L.lv){const c0=S.crowns[L.l.id]||0,pass=L.first/L.total>=0.7;if(pass&&L.lv===c0+1&&c0<3){S.crowns[L.l.id]=c0+1;crown=1;S.gems=(S.gems||0)+5}else if(!pass&&c0<3)crown=-1}
  S.n=(S.n||0)+1;if(L.first===L.total)S.perf=(S.perf||0)+1;if(L.l.id==='practice')S.prac=(S.prac||0)+1;if(hit)S.hits=(S.hits||0)+1;
  const nb=badges().filter(b=>b.ok&&!bb.includes(b.id));
  save();
@@ -605,7 +632,7 @@ function finish(){
 function showOut(){
  $('#lesson').classList.add('on');
  $('#lesson').innerHTML=`<div class="center"><div style="font-size:80px">💔</div><h1>Kalpların bitti</h1><p>Yenilemek için 20 XP harca ya da daha sonra tekrar dene.</p></div>
-  <div class="lf" style="display:grid;gap:10px"><button class="btn" data-act="refill">Kalpleri yenile (−20 XP)</button><button class="btn ghost" data-act="close">Şimdi değil</button></div>`;
+  <div class="lf" style="display:grid;gap:10px"><button class="btn" data-act="refill">Kalpleri yenile (−20 XP)</button>${(S.gems||0)>=10?'<button class="btn" data-act="gheart2">Kalpleri yenile (−10 💎)</button>':''}<button class="btn ghost" data-act="close">Şimdi değil</button></div>`;
 }
 
 /* ---------- kelime kartları ve cümle pratiği ---------- */
@@ -723,12 +750,17 @@ document.addEventListener('click',e=>{
  if(d.level!==undefined){const first=!S.level,lv=+d.level;S.level=lv+1;S.done=[...new Set((first?[]:S.done).concat(['l1','l2','l3','l4','l5','l6'].slice(0,[0,3,6][lv])))];save();closeLesson();return}
  if(d.act==='level'){showLevel();return}
  if(d.act==='update'){updateApp();return}
+ if(d.act==='qclaim'){const q=qToday().find(x=>x.id===d.q),st=qState();if(q&&q.ok&&!q.cl){st.cl.push(q.id);S.gems=(S.gems||0)+q.g;if(qToday().every(x=>x.cl)&&!st.cl.includes('all')){st.cl.push('all');S.gems+=5;toast('Bonus +5 💎')}else toast('+'+q.g+' 💎');save();render()}return}
+ if(d.act==='qmonth'){const mo=monState();if(mo.l>=20&&!mo.c){mo.c=1;S.gems=(S.gems||0)+15;save();toast('+15 💎');render()}return}
+ if(d.act==='gheart'){if(S.hearts>=5)toast('Kalpların dolu');else if((S.gems||0)<10)toast('10 💎 gerekli');else{S.gems-=10;S.hearts=5;save();toast('Kalpler yenilendi ❤️');render()}return}
+ if(d.act==='gfreeze'){if((S.freezes||0)>=2)toast('En fazla 2 dondurucu taşıyabilirsin');else if((S.gems||0)<20)toast('20 💎 gerekli');else{S.gems-=20;S.freezes=(S.freezes||0)+1;save();toast('Seri dondurucu alındı ❄️');render()}return}
+ if(d.act==='gheart2'){if((S.gems||0)>=10){S.gems-=10;S.hearts=5;save();closeLesson()}return}
  if(d.act==='buyfreeze'){if((S.freezes||0)>=2)toast('En fazla 2 dondurucu taşıyabilirsin');else if(S.xp<50)toast('50 XP gerekli');else{S.xp-=50;S.freezes=(S.freezes||0)+1;save();toast('Seri dondurucu alındı ❄️');render()}return}
  if(d.goal){S.goal=+d.goal;save();render();return}
  if(d.tab){S.tab=d.tab;render();return}
  if(d.accent!==undefined){S.accent=+d.accent;save();applyAccent();render();return}
  if(d.lesson){openLesson(d.lesson);return}
- if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{}};save();applyAccent();render();return}
+ if(d.act==='reset'){S={xp:120,streak:4,hearts:5,done:['l1'],today:false,tab:'me',accent:0,goal:20,day:'',todayXp:0,weak:[],learned:[],wToday:0,wGoal:5,free:false,box:{},name:'',city:'',bio:'',rem:{on:false,t:'19:00',last:''},photo:'',crowns:{},freezes:0,lastActive:'',note:'',log:{},gems:0,qd:{d:'',cl:[]},mon:{m:'',l:0,c:0}};save();applyAccent();render();return}
  if(d.act==='close'){closeLesson();return}
  if(d.act==='quit'){closeLesson();return}
  if(d.act==='refill'){S.xp=Math.max(0,S.xp-20);S.hearts=5;save();closeLesson();return}
