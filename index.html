@@ -181,24 +181,55 @@ const UNITS=[
    sents:[{tr:'Affedersiniz, otel nerede?',en:'Excuse me, where is the hotel?',x:['sorry','are']},{tr:'Özür dilerim, geç kaldım',en:'Sorry, I am late',x:['excuse','was']},{tr:'Bu ne kadar?',en:'How much is this?',x:['many','are']}]},
   {id:'l13',title:'Kısa diyaloglar',icon:'🗣️',words:[['What is your name?','Adın ne?','🪪'],['My name is Ali','Benim adım Ali','🙂'],['Where are you from?','Nerelisin?','🌍'],['I am from Turkey','Türkiye\'denim','🇹🇷'],['Do you speak English?','İngilizce konuşuyor musun?','🗣️'],['I am fine, thanks','İyiyim, teşekkürler','😊']],
    sents:[{tr:'Merhaba, nasılsın?',en:'Hello, how are you?',x:['what','is']},{tr:'Adım Ali, memnun oldum',en:'My name is Ali, nice to meet you',x:['your','are']},{tr:'Biraz İngilizce konuşuyorum',en:'I speak a little English',x:['much','speaks']}]}]},
- {t:'Bölüm 5 · İlkokul 4. sınıf',n:'Sınıf, meslekler, kıyafetler, boş zaman, günüm, ülkeler',ls:[
+ {t:'Bölüm 5 · 4. sınıf 1. dönem',n:'Sınıf kuralları, milliyetler, çizgi film, boş zaman, günüm',ls:[
   {id:'l14',title:'Sınıfım',icon:'🎒',words:[['pencil','kalem','✏️'],['eraser','silgi','🧽'],['ruler','cetvel','📏'],['bag','çanta','🎒'],['desk','sıra','🪑'],['notebook','defter','📒']],
    sents:[{tr:'Kalemim sırada',en:'My pencil is on the desk',x:['bag','in']},{tr:'Çantan nerede?',en:'Where is your bag?',x:['my','are']},{tr:'Bir silgi lütfen',en:'An eraser, please',x:['ruler','the']}]},
-  {id:'l15',title:'Meslekler',icon:'👩‍🏫',words:[['teacher','öğretmen','👩‍🏫'],['doctor','doktor','👨‍⚕️'],['nurse','hemşire','👩‍⚕️'],['farmer','çiftçi','👨‍🌾'],['pilot','pilot','👨‍✈️'],['singer','şarkıcı','🎤']],
-   sents:[{tr:'Babam doktor',en:'My father is a doctor',x:['nurse','are']},{tr:'Annem hemşire',en:'My mother is a nurse',x:['teacher','in']},{tr:'Çiftçi tarlada çalışıyor',en:'The farmer works in the field',x:['pilot','at']}]},
-  {id:'l16',title:'Kıyafetlerim',icon:'👕',words:[['shirt','gömlek','👔'],['skirt','etek','👗'],['dress','elbise','👗'],['jacket','ceket','🧥'],['coat','palto','🧥'],['hat','şapka','🎩']],
-   sents:[{tr:'Şapkam mavi',en:'My hat is blue',x:['red','are']},{tr:'Gömleğim beyaz',en:'My shirt is white',x:['black','are']},{tr:'Elbise güzel',en:'The dress is beautiful',x:['ugly','are']}]},
+  {id:'l20',title:'Sınıf eşyaları 2',icon:'🚪',words:[['door','kapı','🚪'],['window','pencere','🪟'],['board','yazı tahtası','📋'],['wall','duvar','🧱'],['chair','sandalye','🪑'],['table','masa','🛋️']],
+   sents:[{tr:'Kapı açık',en:'The door is open',x:['closed','are']},{tr:'Resim duvarda',en:'The picture is on the wall',x:['board','in']},{tr:'Pencere büyük',en:'The window is big',x:['small','are']}]},
+  {id:'l21',title:'Sınıf kuralları',icon:'📢',words:[['Stand up!','Ayağa kalk!','🧍'],['Sit down!','Otur!','💺'],['Be quiet!','Sessiz ol!','🤫'],['Open your book','Kitabını aç','📖'],['Close the door','Kapıyı kapat','🚪'],['May I come in?','İçeri girebilir miyim?','🙋']],
+   sents:[{tr:'Lütfen otur',en:'Please sit down',x:['stand','up']},{tr:'Sessiz ol lütfen',en:'Be quiet, please',x:['loud','is']},{tr:'Kapıyı kapat',en:'Close the door',x:['open','a']}]},
+  {id:'l19',title:'Ülkeler',icon:'🌍',words:[['Turkey','Türkiye','🇹🇷'],['Turkish','Türk','🌙'],['England','İngiltere','🇬🇧'],['English','İngiliz','🫖'],['Germany','Almanya','🇩🇪'],['Japan','Japonya','🇯🇵']],
+   sents:[{tr:'Ben Türküm',en:'I am Turkish',x:['English','is']},{tr:'Almanya\'dan geliyorum',en:'I come from Germany',x:['Japan','to']},{tr:'Japonya çok uzak',en:'Japan is very far',x:['near','are']}]},
+  {id:'l22',title:'Milliyetler',icon:'🗺️',words:[['Italy','İtalya','🇮🇹'],['Italian','İtalyan','🍕'],['France','Fransa','🇫🇷'],['French','Fransız','🥖'],['Spain','İspanya','🇪🇸'],['Spanish','İspanyol','💃']],
+   sents:[{tr:'İtalya\'dan geliyorum',en:'I come from Italy',x:['France','to']},{tr:'Ben Fransızım',en:'I am French',x:['Spanish','is']},{tr:'İspanya güzel',en:'Spain is beautiful',x:['ugly','are']}]},
+  {id:'l23',title:'Çizgi film karakterleri',icon:'🦸',words:[['big','büyük','🐘'],['small','küçük','🐭'],['strong','güçlü','💪'],['fast','hızlı','⚡'],['funny','komik','🤡'],['brave','cesur','🦁']],
+   sents:[{tr:'Kedi küçük',en:'The cat is small',x:['big','are']},{tr:'Köpek hızlı',en:'The dog is fast',x:['slow','are']},{tr:'Kahraman cesur',en:'The hero is brave',x:['funny','a']}]},
+  {id:'l24',title:'Yapabildiklerim',icon:'🦅',words:[['fly','uçmak','🕊️'],['run','koşmak','🏃'],['jump','zıplamak','🦘'],['climb','tırmanmak','🧗'],['sing','şarkı söylemek','🎶'],['cook','yemek pişirmek','🍳']],
+   sents:[{tr:'Kuş uçabilir',en:'The bird can fly',x:['run','is']},{tr:'Ben zıplayabilirim',en:'I can jump',x:['climb','am']},{tr:'Yüzebilir misin?',en:'Can you swim?',x:['fly','are']}]},
   {id:'l17',title:'Boş zaman',icon:'⚽',words:[['play football','futbol oynamak','⚽'],['swim','yüzmek','🏊'],['ride a bike','bisiklete binmek','🚲'],['watch TV','televizyon izlemek','📺'],['listen to music','müzik dinlemek','🎧'],['dance','dans etmek','💃']],
    sents:[{tr:'Futbol oynamayı seviyorum',en:'I like playing football',x:['swimming','am']},{tr:'Bisiklete biniyorum',en:'I ride a bike',x:['swim','the']},{tr:'Müzik dinliyorsun',en:'You listen to music',x:['dance','is']}]},
+  {id:'l25',title:'Hobiler',icon:'🎨',words:[['read books','kitap okumak','📚'],['paint','resim yapmak','🎨'],['play chess','satranç oynamak','♟️'],['play the guitar','gitar çalmak','🎸'],['take photos','fotoğraf çekmek','📷'],['play computer games','bilgisayar oyunu oynamak','🎮']],
+   sents:[{tr:'Satranç oynamayı seviyorum',en:'I like playing chess',x:['painting','am']},{tr:'Resim yapmayı sevmiyorum',en:'I do not like painting',x:['playing','am']},{tr:'Gitar çalıyor musun?',en:'Do you play the guitar?',x:['like','are']}]},
   {id:'l18',title:'Günüm',icon:'🌞',words:[['get up','kalkmak','⏰'],['have breakfast','kahvaltı yapmak','🥐'],['go to school','okula gitmek','🏫'],['do homework','ödev yapmak','📝'],['have dinner','akşam yemeği yemek','🍲'],['go to bed','yatmak','🛏️']],
    sents:[{tr:'Yedide kalkıyorum',en:'I get up at seven',x:['eight','in']},{tr:'Kahvaltı yapıyorum',en:'I have breakfast',x:['dinner','am']},{tr:'Ödevimi yapıyorum',en:'I do my homework',x:['go','the']}]},
-  {id:'l19',title:'Ülkeler',icon:'🌍',words:[['Turkey','Türkiye','🇹🇷'],['Turkish','Türk','🌙'],['England','İngiltere','🇬🇧'],['English','İngiliz','🫖'],['Germany','Almanya','🇩🇪'],['Japan','Japonya','🇯🇵']],
-   sents:[{tr:'Ben Türküm',en:'I am Turkish',x:['English','is']},{tr:'Almanya\'dan geliyorum',en:'I come from Germany',x:['Japan','to']},{tr:'Japonya çok uzak',en:'Japan is very far',x:['near','are']}]}]}
+  {id:'l26',title:'Günün zamanları',icon:'🕒',words:[['noon','öğle','🌞'],['afternoon','öğleden sonra','🌤️'],['evening','akşam','🌆'],['night','gece','🌙'],['clock','saat','🕒'],['minute','dakika','⏲️']],
+   sents:[{tr:'Saat kaç?',en:'What time is it?',x:['where','are']},{tr:'Gece uyuyorum',en:'I sleep at night',x:['noon','in']},{tr:'Saat yedi',en:'It is seven o\'clock',x:['eight','are']}]},
+  {id:'l27',title:'Haftanın günleri',icon:'📆',words:[['Tuesday','salı','2️⃣'],['Wednesday','çarşamba','3️⃣'],['Thursday','perşembe','4️⃣'],['Saturday','cumartesi','🛍️'],['weekend','hafta sonu','🏖️'],['day','gün','📅']],
+   sents:[{tr:'Bugün salı',en:'Today is Tuesday',x:['Wednesday','are']},{tr:'Yarın çarşamba',en:'Tomorrow is Wednesday',x:['Thursday','was']},{tr:'Hafta sonu cumartesi ve pazar',en:'The weekend is Saturday and Sunday',x:['Friday','are']}]}]},
+ {t:'Bölüm 6 · 4. sınıf 2. dönem',n:'Bilim, meslekler, kıyafetler, arkadaşlar, yiyecek',ls:[
+  {id:'l28',title:'Bilimle eğlence',icon:'🔬',words:[['jar','kavanoz','🫙'],['magnet','mıknatıs','🧲'],['microscope','mikroskop','🔬'],['plant','bitki','🌱'],['battery','pil','🔋'],['rock','taş','🪨']],
+   sents:[{tr:'Mıknatıs güçlü',en:'The magnet is strong',x:['weak','are']},{tr:'Kavanoz masada',en:'The jar is on the table',x:['chair','in']},{tr:'Mikroskop nerede?',en:'Where is the microscope?',x:['magnet','are']}]},
+  {id:'l29',title:'Nerede?',icon:'📍',words:[['in front of','önünde','⬆️'],['behind','arkasında','⬇️'],['next to','yanında','↔️'],['between','arasında','🔀'],['on','üstünde','🔝'],['under','altında','🔽']],
+   sents:[{tr:'Kitap sıranın üstünde',en:'The book is on the desk',x:['under','in']},{tr:'Kedi sandalyenin altında',en:'The cat is under the chair',x:['on','at']},{tr:'Okul parkın yanında',en:'The school is next to the park',x:['behind','in']}]},
+  {id:'l15',title:'Meslekler',icon:'👩‍🏫',words:[['teacher','öğretmen','👩‍🏫'],['doctor','doktor','👨‍⚕️'],['nurse','hemşire','👩‍⚕️'],['farmer','çiftçi','👨‍🌾'],['pilot','pilot','👨‍✈️'],['singer','şarkıcı','🎤']],
+   sents:[{tr:'Babam doktor',en:'My father is a doctor',x:['nurse','are']},{tr:'Annem hemşire',en:'My mother is a nurse',x:['teacher','in']},{tr:'Çiftçi tarlada çalışıyor',en:'The farmer works in the field',x:['pilot','at']}]},
+  {id:'l30',title:'Meslekler 2',icon:'👮',words:[['police officer','polis','👮'],['firefighter','itfaiyeci','🧑‍🚒'],['chef','aşçı','🧑‍🍳'],['driver','şoför','🚌'],['dentist','diş hekimi','🦷'],['baker','fırıncı','🥐']],
+   sents:[{tr:'İtfaiyeci cesur',en:'The firefighter is brave',x:['funny','are']},{tr:'Fırıncı ekmek yapar',en:'The baker makes bread',x:['chef','make']},{tr:'Polis sokakta',en:'The police officer is in the street',x:['driver','on']}]},
+  {id:'l16',title:'Kıyafetlerim',icon:'👕',words:[['shirt','gömlek','👔'],['skirt','etek','👗'],['dress','elbise','👗'],['jacket','ceket','🧥'],['coat','palto','🧥'],['hat','şapka','🎩']],
+   sents:[{tr:'Şapkam mavi',en:'My hat is blue',x:['red','are']},{tr:'Gömleğim beyaz',en:'My shirt is white',x:['black','are']},{tr:'Elbise güzel',en:'The dress is beautiful',x:['ugly','are']}]},
+  {id:'l31',title:'Kıyafetlerim 2',icon:'🧦',words:[['trousers','pantolon','👖'],['shoes','ayakkabı','👟'],['socks','çorap','🧦'],['gloves','eldiven','🧤'],['scarf','atkı','🧣'],['boots','bot','🥾']],
+   sents:[{tr:'Ayakkabılarım yeni',en:'My shoes are new',x:['old','is']},{tr:'Atkı sıcak',en:'The scarf is warm',x:['cold','are']},{tr:'Çoraplarım nerede?',en:'Where are my socks?',x:['is','shoes']}]},
+  {id:'l32',title:'Arkadaşlarım',icon:'🧑‍🤝‍🧑',words:[['tall','uzun boylu','📏'],['short','kısa boylu','🧒'],['young','genç','👦'],['old','yaşlı','👴'],['curly hair','kıvırcık saç','🌀'],['brown eyes','kahverengi gözler','👀']],
+   sents:[{tr:'Arkadaşım uzun boylu',en:'My friend is tall',x:['short','are']},{tr:'Kardeşim genç',en:'My brother is young',x:['old','are']},{tr:'Benim kahverengi gözlerim var',en:'I have brown eyes',x:['curly','has']}]},
+  {id:'l33',title:'Yiyecek ve içecek 2',icon:'🥪',words:[['juice','meyve suyu','🧃'],['soup','çorba','🍲'],['rice','pilav','🍚'],['egg','yumurta','🥚'],['banana','muz','🍌'],['chicken','tavuk','🍗']],
+   sents:[{tr:'Meyve suyu istiyorum',en:'I want some juice',x:['water','a']},{tr:'Çorba sıcak',en:'The soup is hot',x:['cold','are']},{tr:'Bir yumurta yiyorum',en:'I eat an egg',x:['banana','a']}]},
+  {id:'l34',title:'Duygular',icon:'😊',words:[['hungry','aç','🤤'],['thirsty','susamış','🥵'],['full','tok','😌'],['happy','mutlu','😊'],['sad','üzgün','😢'],['tired','yorgun','😴']],
+   sents:[{tr:'Açım',en:'I am hungry',x:['thirsty','is']},{tr:'Susadın mı?',en:'Are you thirsty?',x:['hungry','is']},{tr:'Yorgunum',en:'I am tired',x:['happy','are']}]}]}
 ];
 const ALL=UNITS.flatMap(u=>u.ls);
-const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n',l10:'v',l11:'t',l12:'p',l13:'p',l14:'n',l15:'n',l16:'n',l17:'v',l18:'v',l19:'o'};
-const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8','l10','l11','l12','l13','l14','l15','l16','l17','l18','l19'];
-const DAYS=['Monday','Friday','Sunday'],MASS=['water','milk','bread','cheese','tea'];
+const KIND={l1:'o',l2:'n',l3:'n',l4:'a',l5:'n',l6:'n',l7:'o',l8:'o',l9:'n',l10:'v',l11:'t',l12:'p',l13:'p',l14:'n',l15:'n',l16:'n',l17:'v',l18:'v',l19:'o',l20:'n',l21:'p',l22:'o',l23:'o',l24:'v',l25:'v',l26:'o',l27:'o',l28:'n',l29:'o',l30:'n',l31:'o',l32:'o',l33:'n',l34:'o'};
+const ORDER=['l2','l3','l1','l5','l4','l6','l9','l7','l8','l10','l11','l12','l13','l14','l15','l16','l17','l18','l19','l20','l21','l22','l23','l24','l25','l26','l27','l28','l29','l30','l31','l32','l33','l34'];
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],MASS=['water','milk','bread','cheese','tea','juice','soup','rice','chicken'];
 const WP=ORDER.flatMap(id=>ALL.find(x=>x.id===id).words.map(w=>({s:id,en:w[0],tr:w[1],e:w[2],k:DAYS.includes(w[0])?'d':KIND[id]})));
 const OFFSETS=[0,46,66,46,0,-46,-66,-46];
 
@@ -220,7 +251,7 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.12.0';
+const VER='1.13.0';
 function remShow(t,b){
  try{if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(r=>r.showNotification(t,{body:b,icon:'icon-192.png',badge:'favicon-32.png',tag:'dilbaz'})).catch(()=>{try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}});return}}catch(e){}
  try{new Notification(t,{body:b,icon:'icon-192.png'})}catch(e){}
