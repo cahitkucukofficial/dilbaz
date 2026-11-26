@@ -329,7 +329,7 @@ function showLevel(){
  $('#lesson').innerHTML=`<div class="center"><div style="color:var(--brand)">${bird(96,'happy')}</div><h1>İngilizceni nasıl bulursun?</h1><p>Sana uygun yerden başlayalım.</p>
  <div class="opts" style="width:100%"><button class="opt" data-level="0">🌱 Yeni başlıyorum</button><button class="opt" data-level="1">🌿 Biraz biliyorum</button><button class="opt" data-level="2">🌳 İyi biliyorum</button></div></div>`;
 }
-const VER='1.19.0';
+const VER='1.19.1';
 let AC=null;
 function beep(seq){
  try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=AC||new C();if(AC.state==='suspended')AC.resume();
@@ -586,7 +586,9 @@ function mc(w,dir,l){
  return {t:'mc',w:w[0],emoji:w[2],q:dir==='tr2en'?`“${w[1]}” İngilizcede hangisi?`:`“${w[0]}” ne demek?`,
   opts:shuf([w,...others]).map(x=>x[i]),ans:w[i]};
 }
-function pic(w,l){const o=shuf(l.words.filter(x=>x!==w)).slice(0,3);return {t:'mc',pic:true,w:w[0],q:`“${w[0]}” hangisi?`,opts:shuf([w,...o]).map(x=>x[2]),ans:w[2]}}
+const EN_=e=>e.replace(/\uFE0F/g,'').replace('🗓','📅');
+function picOk(l){const e=l.words.map(x=>EN_(x[2]));return new Set(e).size===e.length&&!['d','t'].includes(KIND[l.id])}
+function pic(w,l){if(!picOk(l))return mc(w,'tr2en',l);const o=shuf(l.words.filter(x=>x!==w)).slice(0,3);return {t:'mc',pic:true,w:w[0],q:`“${w[0]}” hangisi?`,opts:shuf([w,...o]).map(x=>x[2]),ans:w[2]}}
 function makeQs(l,lv=2){
  const w=shuf(l.words),s=shuf(l.sents),can='speechSynthesis' in window;
  const ls=x=>({t:'mc',w:x[0],listen:true,q:'Duyduğun kelimeyi seç',ans:x[0],opts:shuf([x,...shuf(l.words.filter(y=>y!==x)).slice(0,3)]).map(y=>y[0])});
